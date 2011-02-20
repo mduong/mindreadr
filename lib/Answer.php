@@ -37,8 +37,6 @@ class Answer {
 	public function getMedia() {
 		return $media;
 	}
-	
-	public set
 }
 
 ?>

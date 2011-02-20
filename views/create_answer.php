@@ -60,7 +60,6 @@
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
-		input.type = 'hidden';
 		input.id = 'media0';
 		if ($('input[name="media0_type"]:checked').val() == "text") {
 			input.type = 'text';
@@ -79,7 +78,6 @@
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
-		input.type = 'hidden';
 		input.id = 'media1';
 		if ($('input[name="media1_type"]:checked').val() == "text") {
 			input.type = 'text';
@@ -98,7 +96,6 @@
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
-		input.type = 'hidden';
 		input.id = 'media2';
 		if ($('input[name="media2_type"]:checked').val() == "text") {
 			input.type = 'text';
