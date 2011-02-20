@@ -10,7 +10,7 @@
 <h2>Create Answers</h2>
 
 <div id="create_answer">
-	<form id="answer_form" method="POST" enctype="multipart/form-data">
+	<form id="answer_form" action="../actions/answers/create.php" method="POST" enctype="multipart/form-data">
 		<p>
 			<span class="bold">Answer</span>: <input type="text" name="answer" /><br />
 			<span class="bold">Type</span>: <select name="answer_type">
