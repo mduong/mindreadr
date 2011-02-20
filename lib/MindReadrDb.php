@@ -8,7 +8,7 @@ class MindReadrDb {
 	
 	function MindReadrDb() {
     	global $SERVER_SETTINGS;
-    	if (!$this->db_handle = sqlite_open($SERVER_SETTINGS["DATABASE_PATH"], 0666, $err)) {//new SQLiteDatabase($SERVER_SETTINGS["DATABASE_PATH"], 0666, $err)) {
+    	if (!$this->db_handle = sqlite_open($SERVER_SETTINGS["DATABASE_PATH"], 0666, $err)) {
       		echo "Error connecting to database";
       		die($err);
 		}
