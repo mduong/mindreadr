@@ -12,7 +12,7 @@
 	if ($media0_type == "text") {
 		$media0 = $_POST["media0"];
 	} else if ($media0_type == "image") {
-		$media0 = "../upload/" . $_FILES["media"]["name"][0];
+		$media0 = "../../upload/" . $_FILES["media"]["name"][0];
 		$media0_tmp = $_FILES["media"]["tmp_name"][0];
 		if (!file_exists($media0)) {
 			move_uploaded_file($media0_tmp, $media0);
@@ -22,7 +22,7 @@
 	if ($media1_type == "text") {
 		$media1 = $_POST["media1"];
 	} else if ($media1_type == "image") {
-		$media1 = "../upload/";
+		$media1 = "../../upload/";
 		if ($media0_type == "image") {
 			$media1 .= $_FILES["media"]["name"][1];
 			$media1_tmp = $_FILES["media"]["name"][1];
@@ -39,7 +39,7 @@
 	if ($media2_type == "text") {
 		$media2 = $_POST["media2"];
 	} else if ($media2_type == "image") {
-		$media2 = "../upload/";
+		$media2 = "../../upload/";
 		if ($media0_type == "image" && $media1_type == "image") {
 			$media2 .= $_FILES["media"]["name"][2];
 			$media2_tmp = $_FILES["media"]["name"][2];
