@@ -81,10 +81,10 @@
 		input.id = 'media1';
 		if ($('input[name="media1_type"]:checked').val() == "text") {
 			input.type = 'text';
-		input.name = 'media1';
+			input.name = 'media1';
 		} else if ($('input[name="media1_type"]:checked').val() == "image") {
 			input.type = 'file';
-			input.type = 'media[]';
+			input.name = 'media[]';
 		}
 		block.appendChild(input);
 	});
