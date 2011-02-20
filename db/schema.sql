@@ -1,5 +1,5 @@
 CREATE TABLE users (
-	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER PRIMARY KEY,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
 	email TEXT UNIQUE NOT NULL,
@@ -18,12 +18,12 @@ CREATE TABLE teams (
 );
 
 CREATE TABLE topics (
-	topic_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	topic_id INTEGER PRIMARY KEY,
 	topic TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE games (
-	game_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id INTEGER PRIMARY KEY,
 	team1_id INTEGER REFERENCES teams(team_id),
 	team2_id INTEGER REFERENCES teams(team_id),
 	score1 INTEGER NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE games (
 );
 
 CREATE TABLE answers (
-	answer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	answer_id INTEGER PRIMARY KEY,
 	answer TEXT NOT NULL,
 	answer_type TEXT NOT NULL,
 	difficulty INTEGER NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE answers (
 );
 
 CREATE TABLE clues (
-	clue_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	clue_id INTEGER PRIMARY KEY,
 	game_id INTEGER REFERENCES games(game_id),
 	giver_id INTEGER REFERENCES users(user_id),
 	receiver_id INTEGER REFERENCES users(user_id),
@@ -50,7 +50,7 @@ CREATE TABLE clues (
 );
 
 CREATE TABLE media (
-	media_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	media_id INTEGER PRIMARY KEY,
 	media TEXT NOT NULL,
 	type TEXT NOT NULL
 );
