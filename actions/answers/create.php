@@ -1,6 +1,6 @@
 <?php
 
-	include("../lib/MindReadrDb.php");
+	include("../../lib/MindReadrDb.php");
 	
 	$answer = $_POST["answer"];
 	$answer_type = $_POST["answer_type"];
