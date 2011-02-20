@@ -1,7 +1,7 @@
 <?php
 
 	$SERVER_SETTINGS = array(
-		"DATABASE_PATH" => "../db/mindreadr.db"
+		"DATABASE_PATH" => "../../db/mindreadr.db"
 	);
 
 ?>
