@@ -35,10 +35,9 @@ CREATE TABLE games (
 
 CREATE TABLE answers (
 	answer_id INTEGER PRIMARY KEY,
-	topic_id INTEGER REFERENCES topics(topic_id),
-	difficulty INTEGER NOT NULL,
 	answer TEXT NOT NULL,
-	points INTEGER NOT NULL,
+	answer_type TEXT NOT NULL,
+	difficulty INTEGER NOT NULL,
 	media_id INTEGER REFERENCES media(media_id)
 );
 
@@ -47,11 +46,11 @@ CREATE TABLE clues (
 	game_id INTEGER REFERENCES games(game_id),
 	giver_id INTEGER REFERENCES users(user_id),
 	receiver_id INTEGER REFERENCES users(user_id),
-	question_id INTEGER REFERENCES answers(answer_id)
+	answer_id INTEGER REFERENCES answers(answer_id)
 );
 
 CREATE TABLE media (
 	media_id INTEGER PRIMARY KEY,
-	type TEXT NOT NULL,
-	media TEXT NOT NULL
+	media TEXT NOT NULL,
+	type TEXT NOT NULL
 );
