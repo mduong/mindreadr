@@ -46,7 +46,7 @@ CREATE TABLE clues (
 	clue_id INTEGER PRIMARY KEY,
 	game_id INTEGER REFERENCES games(game_id),
 	giver_id INTEGER REFERENCES users(user_id),
-	receiver_id INTEGER REFERENCES users(user_id)
+	receiver_id INTEGER REFERENCES users(user_id),
 	question_id INTEGER REFERENCES answers(answer_id)
 );
 
