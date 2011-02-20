@@ -45,18 +45,35 @@
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		$('#answerForm').ajaxForm({
+		
+		$('#answer_form').ajaxForm({
 			clearForm: 'true',
 			success: function() {
+				var block = document.getElementById('easy');
+				var remove = document.getElementById('media0');
+				if (remove) {
+					block.removeChild(remove);
+				}
+				block = document.getElementById('medium');
+				remove = document.getElementById('media1');
+				if (remove) {
+					block.removeChild(remove);
+				}
+				block = document.getElementById('hard');
+				remove = document.getElementById('media2');
+				if (remove) {
+					block.removeChild(remove);
+				}
 				alert("Thank you!");
 			}
 		});
 	});
 	
+	
 	$('input[name="media0_type"]').change(function() {
 		var block = document.getElementById('easy');
 		var remove = document.getElementById('media0');
-		if (remove != undefined) {
+		if (remove) {
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
@@ -74,7 +91,7 @@
 	$('input[name="media1_type"]').change(function() {
 		var block = document.getElementById('medium');
 		var remove = document.getElementById('media1');
-		if (remove != undefined) {
+		if (remove) {
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
@@ -92,7 +109,7 @@
 	$('input[name="media2_type"]').change(function() {
 		var block = document.getElementById('hard');
 		var remove = document.getElementById('media2');
-		if (remove != undefined) {
+		if (remove) {
 			block.removeChild(remove);
 		}
 		var input = document.createElement('input');
