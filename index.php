@@ -32,9 +32,9 @@
 			<div data-role="content">
 				<?php
 					if ($facebook->getSession()) {
-					//	if ($_SESSION['me']) {
-					//		echo 'Already logged in';
-					//	} else {
+						if ($_SESSION['me']) {
+							echo '<a href="views/friends.php" data-role="button">Friends</a>';
+						} else {
 							try {
 								$me = $facebook->api('/me');
 								if (!$db->userExists($me['id'])) {
@@ -52,9 +52,9 @@
 							} catch (FacebookApiException $e) {
 								error_log($e);
 							}
-					//	}
+						}
 					} else {
-						echo '<a href="' . $facebook->getLoginUrl(array("req_perms" => "email")) . '">Login</a>';
+						echo '<a href="' . $facebook->getLoginUrl(array("req_perms" => "email")) . '" data-role="button">Login</a>';
 					}
 				?>
 			</div>
