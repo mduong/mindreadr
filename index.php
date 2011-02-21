@@ -38,10 +38,17 @@
 		</div>
 		<?php
 			if ($facebook->getSession()) {
-				echo "Logged in";
+				try {
+					$me = $facebook->api('/me');
+					foreach ($me as $k => $v) {
+						echo $k . ':' . $v . '<br />';
+					}
+				} catch (FacebookApiException $e) {
+					error_log($e);
+				}
 			} else {
 				echo '<ul>';
-				echo '<li><a href="' . $facebook->getLoginUrl() . '" target="_blank">Login</a></li>';
+				echo '<li><a href="' . $facebook->getLoginUrl() . '" target="_blank">Login with Facebook</a></li>';
 				echo '</ul>';
 			}
 		?>
