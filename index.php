@@ -34,6 +34,7 @@
 					if ($facebook->getSession()) {
 						if ($_SESSION['me']) {
 							echo '<a href="views/friends.php" data-role="button">Friends</a>';
+							echo '<a href="views/topics.php" data-role="button">Topics</a>';
 						} else {
 							try {
 								$me = $facebook->api('/me');
@@ -48,6 +49,7 @@
 								$_SESSION['me'] = $me;
 				?>
 				<a href="views/friends.php" data-role="button">Friends</a>
+				<a href="views/topics.php" data-role="button">Topics</a>
 				<?php
 							} catch (FacebookApiException $e) {
 								error_log($e);

@@ -109,6 +109,15 @@ class MindReadrDb {
 		return $this->db_handle->queryExec($topic_query);
 	}
 	
+	function getTopics() {
+		$result = $this->db_handle->query("SELECT * FROM topics");
+		$topics = array();
+		while ($row = $result->fetch()) {
+			$topics[] = $row;
+		}
+		return json_encode($topics);
+	}
+	
 	function getTopicsSelect() {
 		$result = $this->db_handle->query("SELECT * FROM topics");
 		$topics_select = "";

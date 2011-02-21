@@ -16,7 +16,7 @@
 <!DOCTYPE html> 
 <html> 
 	<head> 
-	<title>Friends</title> 
+	<title>Topics</title> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
@@ -26,7 +26,7 @@
 <div data-role="page">
 
 	<div data-role="header">
-		<h1>Friends</h1>
+		<h1>Topics</h1>
 		<a href="#" class="ui-btn-left ui-btn ui-btn-icon-left ui-btn-corner-all ui-shadow ui-btn-up-a" data-rel="back" data-icon="arrow-l" data-theme="a">
 			<span class="ui-btn-inner ui-btn-corner-all">
 				<span class="ui-btn-text">Back</span>
@@ -35,20 +35,13 @@
 		</a>
 	</div><!-- /header -->
 
-	<div data-role="content">	
-		<ul data-role="listview" class="ui-listview" role="listbox" data-theme="a">
+	<div data-role="content">
+		<div data-role="controlgroup">
 			<?php
-				$friends = $db->getFriends($_SESSION["me"]["id"]);
-				$friends = json_decode($friends);
-				foreach ($friends as $friend) {
-					$parameters = '/' . $friend->{'friend2_id'};
-					$fb_friend = $facebook->api($parameters);
-					echo '<li>';
-					echo '<div class="ui-btn-inner"><div class="ui-btn-text">';
-					echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
-					echo '<h3>' . $fb_friend["name"] . '</h3>';
-					echo '</div></div>';
-					echo '</li>';
+				$topics = $db->getTopics();
+				$topics = json_decode($topics);
+				foreach ($topics as $topic) {
+					echo '<a href="friends.php?topic=' . $topic->{"topic_id"} . '" data-role="button">' . $topic->{"topic"} . '</a>';
 				}
 			?>
 		</ul>
