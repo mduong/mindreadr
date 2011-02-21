@@ -23,14 +23,13 @@
 					icon: 'jqtouch.png',
 					statusBar: 'black-translucent',
 					preloadImages: [
-					'themes/jqt/img/chevron_white.png',
-					'themes/jqt/img/bg_row_select.gif',
+					'themes/jqt/img/chevron.png',
 					'themes/jqt/img/back_button_clicked.png',
 					'themes/jqt/img/button_clicked.png'
 					]
 			});
 		</script>
-</head>
+	</head>
 <body>
 	<div id="home">
 	  	<div class="toolbar">
@@ -41,7 +40,9 @@
 			if ($facebook->getSession()) {
 				echo "Logged in";
 			} else {
-				echo '<a href="' . $facebook->getLoginUrl() . '">Login</a>';
+				echo '<ul>';
+				echo '<li><a href="' . $facebook->getLoginUrl() . '" target="_blank">Login</a></li>';
+				echo '</ul>';
 			}
 		?>
 	</div>

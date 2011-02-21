@@ -423,7 +423,7 @@ class Facebook
       array_merge(array(
         'api_key'         => $this->getAppId(),
         'cancel_url'      => $currentUrl,
-        'display'         => 'page',
+        'display'         => 'touch',
         'fbconnect'       => 1,
         'next'            => $currentUrl,
         'return_session'  => 1,
