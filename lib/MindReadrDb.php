@@ -8,7 +8,7 @@ class MindReadrDb {
 	
 	function MindReadrDb() {
     	global $SERVER_SETTINGS;
-    	if (!$this->db_handle = sqlite_open($SERVER_SETTINGS["DATABASE_PATH"], 0666, $err)) {
+    	if (!$this->db_handle = new SQLiteDatabase($SERVER_SETTINGS["DATABASE_PATH"], 0666, $err)) {
       		echo "Error connecting to database";
       		die($err);
 		}
@@ -20,18 +20,17 @@ class MindReadrDb {
 		$last_name = sqlite_escape_string($user_obj['last_name']);
 		$email = sqlite_escape_string($user_obj['email']);
 		
-		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES('%d', '%s', '%s', '%s')";
+		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES(%d, '%s', '%s', '%s')";
 		$user_sql = sprintf($user_sql, $user_id, $first_name, $last_name, $email);
 		return $this->db_handle->queryExec($user_sql);
 	}
 	
 	function userExists($user_id) {
 		$user_sql = "SELECT * FROM users WHERE user_id='" . sqlite_escape_string($user_id) . "'"; 
-		if ($result = sqlite_query($this->db_handle, $user_sql)) {
-			die($result);
-		} else {
-			return false;
+		if ($result = $this->db_handle->query($user_sql)) {
+			return $result->numRows() > 0;
 		}
+		return false;
 	}
 	
 	function createAnswer($answer, $answer_type, $difficulty, $media, $media_type) {
@@ -42,13 +41,64 @@ class MindReadrDb {
 		$media_type = sqlite_escape_string($media_type);
 		$media_query = "INSERT INTO media(media, type) VALUES ('%s', '%s')";
 		$media_query = sprintf($media_query, $media, $media_type);
-		if (sqlite_exec($this->db_handle, $media_query)) {
+		if ($this->db_handle->queryExec($media_query)) {
 			$last_insert_rowid = sqlite_last_insert_rowid($this->db_handle);
 			$answer_query = "INSERT INTO answers(answer, answer_type, difficulty, media_id) VALUES ('%s', '%s', '%d', '%d')";
 			$answer_query = sprintf($answer_query, $answer, $answer_type, $difficulty, $last_insert_rowid);
-			return sqlite_exec($this->db_handle, $answer_query);
+			return $this->db_handle->queryExec($answer_query);
 		}
 		return false;
+	}
+	
+	function getUserGames($user_id, $who) {
+		
+	}
+	
+	function addFriends($user_id, $friends) {
+		$user_id = sqlite_escape_string($user_id);
+		$friends_query = "";
+		foreach ($friends as $friend) {
+			if ($this->userExists($friend["id"])) {
+				$friend_id = sqlite_escape_string($friend["id"]);
+				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ($user_id, $friend_id); ";
+				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ($friend_id, $user_id); ";
+			}
+		}
+		if ($friends_query != "") {
+			return $this->db_handle->queryExec($friends_query);
+		}
+		return false;
+	}
+	
+	function getFriends($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		$friends_query = "SELECT friend2_id FROM friends WHERE friend1_id='" . $user_id . "'";
+		$result =  $this->db_handle->query($friends_query);
+		$friends = array();
+		while ($row = $result->fetch()) {
+			$friends[] = $row;
+		}
+		return json_encode($friends);
+	}
+	
+	function createTeam($user1_id, $user2_id) {
+		$user1_id = sqlite_escape_string($user1_id);
+		$user2_id = sqlite_escape_string($user2_id);
+		$team_query = "INSERT INTO teams(user1_id, user2_id) VALUES (%d, %d); ";
+		$team_query .= "INSERT INTO teams(user1_id, user2_id) VALUES (%d, %d)";
+		$team_query = sprintf($team_query, $user1_id, $user2_id, $user2_id, $user1_id);
+		return $this->db_handle->queryExec($team_query);
+	}
+	
+	function getUserTeams($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		$team_query = "SELECT team_id, user2_id FROM teams WHERE user1_id=" . $user_id;
+		$result = $this->db_handle->query($team_query);
+		$teams = array();
+		while ($row = $result->fetch()) {
+			$teams[] = $row;
+		}
+		return json_encode($teams);
 	}
 }
 

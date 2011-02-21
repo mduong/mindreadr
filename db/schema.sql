@@ -11,8 +11,10 @@ CREATE TABLE friends (
 );
 
 CREATE TABLE teams (
+	team_id INTEGER PRIMARY KEY,
 	user1_id INTEGER REFERENCES users(user_id),
-	user2_id INTEGER REFERENCES users(user_id)
+	user2_id INTEGER REFERENCES users(user_id),
+	UNIQUE(user1_id, user2_id)
 );
 
 CREATE TABLE topics (
