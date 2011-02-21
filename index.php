@@ -1,5 +1,6 @@
 <?php
 
+	require_once 'lib/MindReadrDb.php';
 	require 'lib/facebook.php';
 	
 	$facebook = new Facebook(array(
@@ -44,6 +45,9 @@
 					$me = $facebook->api('/me');
 					if (!$db->userExists($me['id'])) {
 						$db->createUser($me);
+						echo 'Created user';
+					} else {
+						echo 'User already exists';
 					}
 				} catch (FacebookApiException $e) {
 					error_log($e);
@@ -55,6 +59,5 @@
 			}
 		?>
 	</div>
-	<?php require_once('lib/MindReadrDb.php'); ?>
 </body>
 </html>

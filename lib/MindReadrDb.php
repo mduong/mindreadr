@@ -22,12 +22,16 @@ class MindReadrDb {
 		
 		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES('%d', '%s', '%s', '%s')";
 		$user_sql = sprintf($user_sql, $user_id, $first_name, $last_name, $email);
-		return sqlite_exec($this->db_handle, $user_sql);
+		return $this->db_handle->queryExec($user_sql);
 	}
 	
 	function userExists($user_id) {
 		$user_sql = "SELECT * FROM users WHERE user_id='" . sqlite_escape_string($user_id) . "'"; 
-		return sqlite_query($this->db_handle, $user_sql);
+		if ($result = sqlite_query($this->db_handle, $user_sql)) {
+			die($result);
+		} else {
+			return false;
+		}
 	}
 	
 	function createAnswer($answer, $answer_type, $difficulty, $media, $media_type) {
