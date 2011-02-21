@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<script src="../lib/js/jquery-1.5.min.js"></script>
+		<script src="../jqtouch/jquery.1.3.2.min.js"></script>
 		<script src="../lib/js/jquery.form.js"></script>
 
 		<style>
