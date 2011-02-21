@@ -33,18 +33,19 @@ class MindReadrDb {
 		return false;
 	}
 	
-	function createAnswer($answer, $answer_type, $difficulty, $media, $media_type) {
+	function createAnswer($answer, $answer_type, $difficulty, $topic, $media, $media_type) {
 		$answer = sqlite_escape_string($answer);
 		$answer_type = sqlite_escape_string($answer_type);
 		$difficulty = sqlite_escape_string($difficulty);
+		$topic = sqlite_escape_string($topic);
 		$media = sqlite_escape_string($media);
 		$media_type = sqlite_escape_string($media_type);
 		$media_query = "INSERT INTO media(media, type) VALUES ('%s', '%s')";
 		$media_query = sprintf($media_query, $media, $media_type);
 		if ($this->db_handle->queryExec($media_query)) {
 			$last_insert_rowid = sqlite_last_insert_rowid($this->db_handle);
-			$answer_query = "INSERT INTO answers(answer, answer_type, difficulty, media_id) VALUES ('%s', '%s', '%d', '%d')";
-			$answer_query = sprintf($answer_query, $answer, $answer_type, $difficulty, $last_insert_rowid);
+			$answer_query = "INSERT INTO answers(answer, answer_type, difficulty, topic, media_id) VALUES ('%s', '%s', '%d', '%d', '%d')";
+			$answer_query = sprintf($answer_query, $answer, $answer_type, $difficulty, $topic, $last_insert_rowid);
 			return $this->db_handle->queryExec($answer_query);
 		}
 		return false;
@@ -99,6 +100,22 @@ class MindReadrDb {
 			$teams[] = $row;
 		}
 		return json_encode($teams);
+	}
+	
+	function addTopic($topic) {
+		$topic = sqlite_escape_string($topic);
+		$topic_query = "INSERT INTO topics(topic) VALUES ('%s')";
+		$topic_query = sprintf($topic_query, $topic);
+		return $this->db_handle->queryExec($topic_query);
+	}
+	
+	function getTopicsSelect() {
+		$result = $this->db_handle->query("SELECT * FROM topics");
+		$topics_select = "";
+		while ($row = $result->fetch()) {
+			$topics_select .= '<option value="' . $row["topic_id"] . '">' . $row["topic"] . '</option>';
+		}
+		return $topics_select;
 	}
 }
 

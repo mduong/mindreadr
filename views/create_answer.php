@@ -1,7 +1,15 @@
+<?php
+	require '../lib/MindReadrDb.php';
+	
+	$db = new MindReadrDb();
+	
+	$topics = $db->getTopicsSelect();
+?>
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<script src="../jqtouch/jquery.1.3.2.min.js"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript"> google.load("jquery", "1.5.0"); </script>
 		<script src="../lib/js/jquery.form.js"></script>
 
 		<style>
@@ -18,7 +26,11 @@
 			<form id="answer_form" action="../actions/answers/create.php" method="POST" enctype="multipart/form-data">
 				<p>
 					<span class="bold">Answer</span>: <input type="text" name="answer" /><br />
-					<span class="bold">Type</span>: <select name="answer_type">
+					<span class="bold">Topic</span>:
+					<select id="topic"><?php echo $topics; ?></select>
+					<input type="button" onclick="newTopic();" value="Add a new topic" /><br />
+					<span class="bold">Type</span>:
+					<select name="answer_type">
 						<option value="Person">Person</option>
 						<option value="Place">Place</option>
 						<option value="Thing">Thing</option>
@@ -49,6 +61,21 @@
 	</body>
 
 	<script type="text/javascript">
+	
+		function newTopic() {
+			var topic = prompt("Please enter a new topic");
+			if (topic != null && topic != "") {
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						$('#topic').html(xmlhttp.responseText);
+					}
+				}
+				xmlhttp.open("POST", "../actions/topics/new.php", true);
+				xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				xmlhttp.send("topic=" + topic);
+			}
+		}
 	
 		$(document).ready(function() {
 			

@@ -37,6 +37,7 @@ CREATE TABLE answers (
 	answer_id INTEGER PRIMARY KEY,
 	answer TEXT NOT NULL,
 	answer_type TEXT NOT NULL,
+	topic_id INTEGER REFERENCES topics(topic_id),
 	difficulty INTEGER NOT NULL,
 	media_id INTEGER REFERENCES media(media_id)
 );
