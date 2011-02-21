@@ -50,7 +50,7 @@
 				}
 			} else {
 				echo '<ul>';
-				echo '<li><a href="' . $facebook->getLoginUrl('req_perms' => 'email') . '" target="_blank">Login</a></li>';
+				echo '<li><a href="' . $facebook->getLoginUrl(array("req_perms" => "email")) . '" target="_blank">Login</a></li>';
 				echo '</ul>';
 			}
 		?>
