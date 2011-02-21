@@ -1,17 +1,21 @@
 <html>
 	<head>
 		<title>MindReadr</title>
-		
-		<link type="text/css" rel="stylesheet" media="screen" href="jqtouch/jqtouch.min.css">
-		<link type="text/css" rel="stylesheet" media="screen" href="themes/apple/theme.min.css">
-		
-		<!-- javascript -->
-		<script src="jquery.1.3.2.min.js"></script>
-		<script src="jqtouch/jqtouch.min.js"></script>
-		<script src="jqtouch/jqtouch.transitions.js"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript">google.load("jquery", "1.4.2");</script>
+		<script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+		<style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
+		<style type="text/css" media="screen">@import "themes/jqt/theme.min.css";</style>
 		<script type="text/javascript">
-			var jQT = new $.jQTouch({
-				icon: 'images/appicon.png'
+			$.jQTouch({
+					icon: 'jqtouch.png',
+					statusBar: 'black-translucent',
+					preloadImages: [
+					'themes/jqt/img/chevron_white.png',
+					'themes/jqt/img/bg_row_select.gif',
+					'themes/jqt/img/back_button_clicked.png',
+					'themes/jqt/img/button_clicked.png'
+					]
 			});
 		</script>
 </head>
