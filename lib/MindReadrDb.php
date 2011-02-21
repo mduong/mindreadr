@@ -15,13 +15,19 @@ class MindReadrDb {
 	}
 	
 	function createUser($user_obj) {
-		$user_obj = json_decode($user_obj);
-		foreach ($user_obj as $k => $v) {
-			$user_obj->$k = sqlite_escape_string($v);
-		}
-		$user_sql="INSERT INTO users(fb_email_address, full_name, confirmed, salt, hashed_password) VALUES('%s', '%s', '%d', '%d', '%s')";
-		$user_sql=sprintf($user_sql,$user_obj->fb_email_address,$user_obj->full_name,$user_obj->confirmed,$user_obj->salt,$user_obj->hashed_password);
-		$this->db_handle->queryExec($user_sql);
+		$user_id = sqlite_escape_string($user_obj['id']);
+		$first_name = sqlite_escape_string($user_obj['first_name']);
+		$last_name = sqlite_escape_string($user_obj['last_name']);
+		$email = sqlite_escape_string($user_obj['email']);
+		
+		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES('%d', '%s', '%s', '%s')";
+		$user_sql = sprintf($user_sql, $user_id, $first_name, $last_name, $email);
+		return sqlite_exec($this->db_handle, $user_sql);
+	}
+	
+	function userExists($user_id) {
+		$user_sql = "SELECT * FROM users WHERE user_id='" . sqlite_escape_string($user_id) . "'"; 
+		return sqlite_query($this->db_handle, $user_sql);
 	}
 	
 	function createAnswer($answer, $answer_type, $difficulty, $media, $media_type) {

@@ -7,6 +7,8 @@
 		'secret' => '954447415b7f3d150c4772af1a66b4df',
 		'cookie' => true,
 	));
+	
+	$db = new MindReadrDb();
 
 ?>
 
@@ -38,10 +40,17 @@
 		</div>
 		<?php
 			if ($facebook->getSession()) {
-				echo "Logged in";
+				try {
+					$me = $facebook->api('/me');
+					if (!$db->userExists($me['id'])) {
+						$db->createUser($me);
+					}
+				} catch (FacebookApiException $e) {
+					error_log($e);
+				}
 			} else {
 				echo '<ul>';
-				echo '<li><a href="' . $facebook->getLoginUrl() . '" target="_blank">Login</a></li>';
+				echo '<li><a href="' . $facebook->getLoginUrl('req_perms' => 'email') . '" target="_blank">Login</a></li>';
 				echo '</ul>';
 			}
 		?>

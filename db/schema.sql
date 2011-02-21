@@ -2,9 +2,7 @@ CREATE TABLE users (
 	user_id INTEGER PRIMARY KEY,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
-	email TEXT UNIQUE NOT NULL,
-	password TEXT NOT NULL,
-	phone INTEGER UNIQUE NOT NULL
+	email TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE friends (
