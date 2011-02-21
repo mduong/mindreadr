@@ -1,3 +1,15 @@
+<?php
+
+	require 'lib/facebook.php';
+	
+	$facebook = new Facebook(array(
+		'appId' => '165478150170952',
+		'secret' => '954447415b7f3d150c4772af1a66b4df',
+		'cookie' => true,
+	));
+
+?>
+
 <html>
 	<head>
 		<title>MindReadr</title>
@@ -25,6 +37,13 @@
 			<h1>MindReadr</h1>
 			<a class="button slideup" id="about_button" href="#about">About</a>
 		</div>
+		<?php
+			if ($facebook->getSession()) {
+				echo "Logged in";
+			} else {
+				echo '<a href="' . $facebook->getLoginUrl() . '">Login</a>';
+			}
+		?>
 	</div>
 	<?php require_once('lib/MindReadrDb.php'); ?>
 </body>

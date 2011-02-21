@@ -1,6 +1,6 @@
 <div id="login">
     <div class="toolbar">
-		<h1>IOUOMe</h1>
+		<h1>MindReadr</h1>
 		<a class="button slideup" id="infoButton" href="#about">About</a>
 	</div>
 	<h2>Login</h2>
@@ -12,5 +12,5 @@
     </form>
 	<a href="#" style="margin-right: 10px; float: right;" class="whiteButton submit">Login</a><br /><br /><br />
 	<h2>Need an account?</h2>
-	<a href="#signup" style="margin: 10px; text-align: center;" class="whiteButton submit" onclick="jQT.goTo('#signup', 'flip');">Sign Up</a>
+	<a href="#signup" style="margin: 10px; text-align: center;" class="whiteButton submit">Sign Up</a>
 </div>
