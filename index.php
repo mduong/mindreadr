@@ -8,7 +8,7 @@
 		<!-- javascript -->
 		<script src="jquery.1.3.2.min.js"></script>
 		<script src="jqtouch/jqtouch.min.js"></script>
-		<script src="jqtouch.transitions.js"></script>
+		<script src="jqtouch/jqtouch.transitions.js"></script>
 		<script type="text/javascript">
 			var jQT = new $.jQTouch({
 				icon: 'images/appicon.png'
