@@ -44,7 +44,7 @@
 					echo '<a href="friends.php?topic=' . $topic->{"topic_id"} . '" data-role="button">' . $topic->{"topic"} . '</a>';
 				}
 			?>
-		</ul>
+		</div>
 	</div><!-- /content -->
 
 	<div data-role="footer">
