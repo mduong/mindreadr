@@ -1,12 +1,6 @@
 <?php 
-	require '../lib/MindReadrDb.php';
-	require '../lib/facebook.php';
-	
-	$facebook = new Facebook(array(
-		'appId' => '165478150170952',
-		'secret' => '954447415b7f3d150c4772af1a66b4df',
-		'cookie' => true,
-	));
+	require_once '../lib/MindReadrDb.php';
+	require_once '../lib/fb_config.php';
 	
 	$db = new MindReadrDb();
 	
@@ -16,8 +10,20 @@
 <!DOCTYPE html> 
 <html> 
 	<head> 
-	<title>Friends</title> 
+	<title>Select a teammate</title> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+	<script>
+		function createTeam(user1_id, user2_id) {
+			$.ajax({
+				type: "POST",
+				url: "../actions/teams/create.php",
+				data: "user1_id=" + user1_id + "&user2_id=" + user2_id,
+				success: function(data) {
+					$.mobile.changePage('teams.php?topic=' + <?php echo $_GET["topic"]; ?> + '&team_id=' + data);
+				}
+			});
+		}
+	</script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
 </head> 
@@ -26,17 +32,12 @@
 <div data-role="page">
 
 	<div data-role="header">
-		<h1>Friends</h1>
-		<a href="#" class="ui-btn-left ui-btn ui-btn-icon-left ui-btn-corner-all ui-shadow ui-btn-up-a" data-rel="back" data-icon="arrow-l" data-theme="a">
-			<span class="ui-btn-inner ui-btn-corner-all">
-				<span class="ui-btn-text">Back</span>
-				<span class="ui-icon ui-icon-arrow-l ui-icon-shadow"></span>
-			</span>
-		</a>
+		<h1>Select a teammate</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
 	</div><!-- /header -->
 
-	<div data-role="content">	
-		<ul data-role="listview" class="ui-listview" role="listbox" data-theme="a">
+	<div data-role="content">
+		<ul data-role="listview" role="listbox">
 			<?php
 				$friends = $db->getFriends($_SESSION["me"]["id"]);
 				$friends = json_decode($friends);
@@ -44,10 +45,8 @@
 					$parameters = '/' . $friend->{'friend2_id'};
 					$fb_friend = $facebook->api($parameters);
 					echo '<li>';
-					echo '<div class="ui-btn-inner"><div class="ui-btn-text">';
 					echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
-					echo '<h3>' . $fb_friend["name"] . '</h3>';
-					echo '</div></div>';
+					echo '<a href="teams.php?topic=' . $_GET["topic"] . '&friend=' . $fb_friend["id"] . '">' . $fb_friend["name"] . '</a>';
 					echo '</li>';
 				}
 			?>

@@ -1,5 +1,4 @@
 <?php
-
 	include("../../lib/MindReadrDb.php");
 	
 	$answer = $_POST["answer"];

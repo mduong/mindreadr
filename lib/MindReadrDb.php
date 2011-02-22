@@ -20,7 +20,7 @@ class MindReadrDb {
 		$last_name = sqlite_escape_string($user_obj['last_name']);
 		$email = sqlite_escape_string($user_obj['email']);
 		
-		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES(%d, '%s', '%s', '%s')";
+		$user_sql = "INSERT INTO users(user_id, first_name, last_name, email) VALUES('%d', '%s', '%s', '%s')";
 		$user_sql = sprintf($user_sql, $user_id, $first_name, $last_name, $email);
 		return $this->db_handle->queryExec($user_sql);
 	}
@@ -61,8 +61,8 @@ class MindReadrDb {
 		foreach ($friends as $friend) {
 			if ($this->userExists($friend["id"])) {
 				$friend_id = sqlite_escape_string($friend["id"]);
-				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ($user_id, $friend_id); ";
-				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ($friend_id, $user_id); ";
+				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ('$user_id', '$friend_id'); ";
+				$friends_query .= "INSERT INTO friends(friend1_id, friend2_id) VALUES ('$friend_id', '$user_id'); ";
 			}
 		}
 		if ($friends_query != "") {
@@ -82,22 +82,59 @@ class MindReadrDb {
 		return json_encode($friends);
 	}
 	
+	function teamExists($user1_id, $user2_id) {
+		$user1_id = sqlite_escape_string($user1_id);
+		$user2_id = sqlite_escape_string($user2_id);
+		$team_query = "SELECT FROM teams WHERE user1_id='%d' AND user2_id='%d'";
+		$team_query = sprintf($team_query, $user1_id, $user2_id);
+		if ($result = $this->db_handle->query($user_sql)) {
+			if ($result->numRows() > 0) {
+				$team = $result->fetch();
+				return $team["team_id"];
+			}
+		}
+		return false;
+	}
+	
 	function createTeam($user1_id, $user2_id) {
 		$user1_id = sqlite_escape_string($user1_id);
 		$user2_id = sqlite_escape_string($user2_id);
-		$team_query = "INSERT INTO teams(user1_id, user2_id) VALUES (%d, %d); ";
-		$team_query .= "INSERT INTO teams(user1_id, user2_id) VALUES (%d, %d)";
-		$team_query = sprintf($team_query, $user1_id, $user2_id, $user2_id, $user1_id);
+		$team_query = "INSERT INTO teams(user1_id, user2_id) VALUES ('%d', '%d'); ";
+		$team_query = sprintf($team_query, $user1_id, $user2_id);
 		return $this->db_handle->queryExec($team_query);
 	}
 	
 	function getUserTeams($user_id) {
 		$user_id = sqlite_escape_string($user_id);
-		$team_query = "SELECT team_id, user2_id FROM teams WHERE user1_id=" . $user_id;
+		$team_query = "SELECT * FROM teams WHERE user1_id='" . $user_id . "' OR user2_id='" . $user_id . "'";
 		$result = $this->db_handle->query($team_query);
 		$teams = array();
 		while ($row = $result->fetch()) {
 			$teams[] = $row;
+		}
+		return json_encode($teams);
+	}
+	
+	function getPotentialTeams($team_id, $user1_id, $user2_id) {
+		$team_id = sqlite_escape_string($team_id);
+		$user1_id = sqlite_escape_string($user1_id);
+		$user2_id = sqlite_escape_string($user2_id);
+		$team_query = "SELECT * FROM teams WHERE team_id<>'%d'";
+		$team_query = sprintf($team_query, $team_id);
+		$result = $this->db_handle->query($team_query);
+		$teams = array();
+		while ($row = $result->fetch()) {
+			if ($row["user1_id"] != $user1_id && $row["user2_id"] != $user2_id && $row["user1_id"] != $user2_id && $row["user2_id"] != $user1_id) {
+				$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user1_id"];
+				$result = $this->db_handle->query($user_query);
+				$user = $result->fetch();
+				$row["user1_name"] = $user["first_name"];
+				$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user2_id"];
+				$result = $this->db_handle->query($user_query);
+				$user = $result->fetch();
+				$row["user2_name"] = $user["first_name"];
+				$teams[] = $row;
+			}
 		}
 		return json_encode($teams);
 	}

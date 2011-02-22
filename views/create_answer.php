@@ -65,15 +65,14 @@
 		function newTopic() {
 			var topic = prompt("Please enter a new topic");
 			if (topic != null && topic != "") {
-				var xmlhttp = new XMLHttpRequest();
-				xmlhttp.onreadystatechange = function() {
-					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-						$('#topic').html(xmlhttp.responseText);
+				$.ajax({
+					type: "POST",
+					url: "../actions/topics/new.php",
+					data: "topic=" + topic,
+					success: function(data) {
+						$('#topic').html(data);
 					}
-				}
-				xmlhttp.open("POST", "../actions/topics/new.php", true);
-				xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				xmlhttp.send("topic=" + topic);
+				});
 			}
 		}
 	
