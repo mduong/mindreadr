@@ -43,9 +43,9 @@ class MindReadrDb {
 		$media_query = "INSERT INTO media(media, type) VALUES ('%s', '%s')";
 		$media_query = sprintf($media_query, $media, $media_type);
 		if ($this->db_handle->queryExec($media_query)) {
-			$last_insert_rowid = sqlite_last_insert_rowid($this->db_handle);
-			$answer_query = "INSERT INTO answers(answer, answer_type, difficulty, topic, media_id) VALUES ('%s', '%s', '%d', '%d', '%d')";
-			$answer_query = sprintf($answer_query, $answer, $answer_type, $difficulty, $topic, $last_insert_rowid);
+			$last_insert_rowid = $this->db_handle->lastInsertRowid();
+			$answer_query = "INSERT INTO answers(answer, answer_type, topic_id, difficulty, media_id) VALUES ('%s', '%s', '%d', '%d', '%d')";
+			$answer_query = sprintf($answer_query, $answer, $answer_type, $topic, $difficulty, $last_insert_rowid);
 			return $this->db_handle->queryExec($answer_query);
 		}
 		return false;

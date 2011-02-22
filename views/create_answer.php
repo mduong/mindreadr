@@ -27,7 +27,7 @@
 				<p>
 					<span class="bold">Answer</span>: <input type="text" name="answer" /><br />
 					<span class="bold">Topic</span>:
-					<select id="topic"><?php echo $topics; ?></select>
+					<select id="topic" name="topic"><?php echo $topics; ?></select>
 					<input type="button" onclick="newTopic();" value="Add a new topic" /><br />
 					<span class="bold">Type</span>:
 					<select name="answer_type">
@@ -77,7 +77,6 @@
 		}
 	
 		$(document).ready(function() {
-			
 			$('#answer_form').ajaxForm({
 				clearForm: 'true',
 				success: function() {
