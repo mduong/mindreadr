@@ -12,18 +12,6 @@
 	<head> 
 	<title>Select a teammate</title> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
-	<script>
-		function createTeam(user1_id, user2_id) {
-			$.ajax({
-				type: "POST",
-				url: "../actions/teams/create.php",
-				data: "user1_id=" + user1_id + "&user2_id=" + user2_id,
-				success: function(data) {
-					$.mobile.changePage('teams.php?topic=' + <?php echo $_GET["topic"]; ?> + '&team_id=' + data);
-				}
-			});
-		}
-	</script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
 </head> 
@@ -46,7 +34,11 @@
 					$fb_friend = $facebook->api($parameters);
 					echo '<li>';
 					echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
-					echo '<a href="teams.php?topic=' . $_GET["topic"] . '&friend=' . $fb_friend["id"] . '">' . $fb_friend["name"] . '</a>';
+					if ($_GET["topic"]) {
+						echo '<a href="teams.php?topic=' . $_GET["topic"] . '&friend=' . $fb_friend["id"] . '">' . $fb_friend["name"] . '</a>';
+					} else {
+						echo '<h3>' . $fb_friend["name"] . '</h3>';
+					}
 					echo '</li>';
 				}
 			?>

@@ -22,9 +22,11 @@
 			</div>
 			
 			<div data-role="content">
+				<ul data-role="listview">
+					<li>
 				<?php
 					if ($_SESSION['me']) {
-						echo '<p>Welcome back ' . $_SESSION['me']['first_name'] . '!</p>';
+						echo 'Welcome back ' . $_SESSION['me']['first_name'] . '!';
 					} else {
 						try {
 							$me = $facebook->api('/me');
@@ -32,9 +34,9 @@
 								$db->createUser($me);
 								$friends = $facebook->api('/me/friends');
 								$db->addFriends($me['id'], $friends["data"]);
-								echo '<p>Welcome to MindReadr, ' . $me['first_name'] . '!</p>';
+								echo 'Welcome to MindReadr, ' . $me['first_name'] . '!';
 							} else {
-								echo '<p>Welcome back ' . $me['first_name'] . '!</p>';
+								echo 'Welcome back ' . $me['first_name'] . '!';
 							}
 							$_SESSION['me'] = $me;
 						} catch (FacebookApiException $e) {
@@ -42,6 +44,9 @@
 						}
 					}
 				?>
+					</li>
+				</ul>
+				<br />
 				<a href="views/topics.php?play=friends" data-role="button">Play with Friends</a>
 				<a href="views/topics.php?play=instant" data-role="button">Play Instantly</a>
 				<a href="views/friends.php" data-role="button">Friends</a>

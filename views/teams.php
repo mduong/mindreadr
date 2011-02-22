@@ -19,7 +19,7 @@
 <!DOCTYPE html> 
 <html> 
 	<head> 
-	<title>Select an opponent</title> 
+	<title>Select opponents</title> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
@@ -29,7 +29,7 @@
 <div data-role="page">
 
 	<div data-role="header">
-		<h1>Select an opponent</h1>
+		<h1>Select opponents</h1>
 		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
 	</div><!-- /header -->
 
@@ -38,12 +38,16 @@
 			<?php
 				$teams = $db->getPotentialTeams($team_id, $user1_id, $user2_id);
 				$teams = json_decode($teams);
-				foreach ($teams as $team) {
-					echo '<li>';
-					echo '<img src="https://graph.facebook.com/' . $team->{"user1_id"} . '/picture" />';
-					echo '<img src="https://graph.facebook.com/' . $team->{"user2_id"} . '/picture" />';
-					echo $team->{"user1_name"} . ' and ' . $team->{"user2_name"};
-					echo '</li>';
+				if (empty($teams)) {
+					echo '<li>There are no opponents available!</li>';
+				} else {
+					foreach ($teams as $team) {
+						echo '<li>';
+						echo '<img src="https://graph.facebook.com/' . $team->{"user1_id"} . '/picture" />';
+						echo '<img src="https://graph.facebook.com/' . $team->{"user2_id"} . '/picture" />';
+						echo $team->{"user1_name"} . ' and ' . $team->{"user2_name"};
+						echo '</li>';
+					}
 				}
 			?>
 		</ul>
