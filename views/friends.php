@@ -29,9 +29,15 @@
 			<?php
 				$friends = $db->getFriends($_SESSION["me"]["id"]);
 				$friends = json_decode($friends);
+				$last_letter = "";
 				foreach ($friends as $friend) {
 					$parameters = '/' . $friend->{'friend2_id'};
 					$fb_friend = $facebook->api($parameters);
+					$letter = substr($fb_friend["name"], 0, 1);
+					if ($letter != $last_letter) {
+						echo '<li data-role="list-divider">' . $letter . '</li>';
+						$last_letter = $letter;
+					}
 					echo '<li>';
 					echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
 					if ($_GET["topic"]) {

@@ -24,26 +24,26 @@
 			<div data-role="content">
 				<ul data-role="listview">
 					<li>
-				<?php
-					if ($_SESSION['me']) {
-						echo 'Welcome back ' . $_SESSION['me']['first_name'] . '!';
-					} else {
-						try {
-							$me = $facebook->api('/me');
-							if (!$db->userExists($me['id'])) {
-								$db->createUser($me);
-								$friends = $facebook->api('/me/friends');
-								$db->addFriends($me['id'], $friends["data"]);
-								echo 'Welcome to MindReadr, ' . $me['first_name'] . '!';
-							} else {
-								echo 'Welcome back ' . $me['first_name'] . '!';
+					<?php
+						if ($_SESSION['me']) {
+							echo 'Welcome back ' . $_SESSION['me']['first_name'] . '!';
+						} else {
+							try {
+								$me = $facebook->api('/me');
+								if (!$db->userExists($me['id'])) {
+									$db->createUser($me);
+									$friends = $facebook->api('/me/friends');
+									$db->addFriends($me['id'], $friends["data"]);
+									echo 'Welcome to MindReadr, ' . $me['first_name'] . '!';
+								} else {
+									echo 'Welcome back ' . $me['first_name'] . '!';
+								}
+								$_SESSION['me'] = $me;
+							} catch (FacebookApiException $e) {
+								error_log($e);
 							}
-							$_SESSION['me'] = $me;
-						} catch (FacebookApiException $e) {
-							error_log($e);
 						}
-					}
-				?>
+					?>
 					</li>
 				</ul>
 				<br />

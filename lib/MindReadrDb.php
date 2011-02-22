@@ -73,7 +73,7 @@ class MindReadrDb {
 	
 	function getFriends($user_id) {
 		$user_id = sqlite_escape_string($user_id);
-		$friends_query = "SELECT friend2_id FROM friends WHERE friend1_id='" . $user_id . "'";
+		$friends_query = "SELECT friend2_id FROM friends JOIN users ON friend2_id=user_id WHERE friend1_id='" . $user_id . "' ORDER BY first_name";
 		$result =  $this->db_handle->query($friends_query);
 		$friends = array();
 		while ($row = $result->fetch()) {
@@ -147,7 +147,7 @@ class MindReadrDb {
 	}
 	
 	function getTopics() {
-		$result = $this->db_handle->query("SELECT * FROM topics");
+		$result = $this->db_handle->query("SELECT * FROM topics ORDER BY topic");
 		$topics = array();
 		while ($row = $result->fetch()) {
 			$topics[] = $row;
