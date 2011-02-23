@@ -38,11 +38,12 @@
 						echo '<li data-role="list-divider">' . $letter . '</li>';
 						$last_letter = $letter;
 					}
-					echo '<li>';
-					echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
-					if ($_GET["topic"]) {
-						echo '<a href="teams.php?topic=' . $_GET["topic"] . '&friend=' . $fb_friend["id"] . '">' . $fb_friend["name"] . '</a>';
+					if ($_GET["topic_id"]) {
+						echo '<li onclick="createTeam(' . $_GET["topic_id"] . ',' . $_SESSION["me"]["id"] . ',' . $fb_friend["id"] . ');">';
+						echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
+						echo $fb_friend["name"];
 					} else {
+						echo '<li>';
 						echo '<h3>' . $fb_friend["name"] . '</h3>';
 					}
 					echo '</li>';

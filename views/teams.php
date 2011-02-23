@@ -6,14 +6,10 @@
 	
 	session_start();
 	
-	$user1_id = $_SESSION["me"]["id"];
-	$user2_id = $_GET["friend"];
+	$user1_id = $_GET["user1_id"];
+	$user2_id = $_GET["user2_id"];
 	
-	if (!($team_id = $db->teamExists($user1_id, $user2_id))) {
-		$asdf = "false";
-		$db->createTeam($user1_id, $user2_id);
-		$team_id = $db->teamExists($user1_id, $user2_id);
-	}
+	$team_id = $_GET["team_id"];
 ?>
 
 <!DOCTYPE html> 
@@ -45,7 +41,8 @@
 						echo '<li>';
 						echo '<img src="https://graph.facebook.com/' . $team->{"user1_id"} . '/picture" />';
 						echo '<img src="https://graph.facebook.com/' . $team->{"user2_id"} . '/picture" />';
-						echo $team->{"user1_name"} . ' and ' . $team->{"user2_name"};
+						echo '<a href="start.php?topic_id=' . $_GET["topic_id"] . '&team_id=' . $team_id . '&opponent_id=' . $team->{"team_id"} . '">';
+						echo $team->{"user1_name"} . ' and ' . $team->{"user2_name"} . '</a>';
 						echo '</li>';
 					}
 				}

@@ -4,6 +4,7 @@
 	$answer = $_POST["answer"];
 	$answer_type = $_POST["answer_type"];
 	$topic = $_POST["topic"];
+	$learn_more = $_POST["learn_more"];
 	
 	$media0_type = $_POST["media0_type"];
 	$media1_type = $_POST["media1_type"];
@@ -56,7 +57,5 @@
 	}
 	
 	$db = new MindReadrDb();
-	$db->createAnswer($answer, $answer_type, 0, $topic, $media0, $media0_type);
-	$db->createAnswer($answer, $answer_type, 1, $topic, $media1, $media1_type);
-	$db->createAnswer($answer, $answer_type, 2, $topic, $media2, $media2_type);
+	$db->createAnswer($answer, $answer_type, $topic, $media0, $media0_type, $media1, $media1_type, $media2, $media2_type, $learn_more);
 ?>

@@ -14,7 +14,42 @@ CREATE TABLE teams (
 	team_id INTEGER PRIMARY KEY,
 	user1_id INTEGER REFERENCES users(user_id),
 	user2_id INTEGER REFERENCES users(user_id),
+	answers INTEGER REFERENCES team_answers(id),
+	clues INTEGER REFERENCES team_clues(id),
+	state1 INTEGER,
+	state2 INTEGER,
+	in_game INTEGER NOT NULL,
 	UNIQUE(user1_id, user2_id)
+);
+
+CREATE TABLE team_answers (
+	id INTEGER PRIMARY KEY,
+	team_id INTEGER UNIQUE NOT NULL,
+	answer1_id INTEGER REFERENCES answers(answer_id),
+	answer2_id INTEGER REFERENCES answers(answer_id),
+	answer3_id INTEGER REFERENCES answers(answer_id),
+	answer4_id INTEGER REFERENCES answers(answer_id),
+	answer5_id INTEGER REFERENCES answers(answer_id),
+	answer6_id INTEGER REFERENCES answers(answer_id),
+	answer7_id INTEGER REFERENCES answers(answer_id),
+	answer8_id INTEGER REFERENCES answers(answer_id),
+	answer9_id INTEGER REFERENCES answers(answer_id),
+	answer10_id INTEGER REFERENCES answers(answer_id)
+);
+
+CREATE TABLE team_clues (
+	id INTEGER PRIMARY KEY,
+	team_id INTEGER UNIQUE NOT NULL,
+	clue1_id INTEGER REFERENCES clues(clue_id),
+	clue2_id INTEGER REFERENCES clues(clue_id),
+	clue3_id INTEGER REFERENCES clues(clue_id),
+	clue4_id INTEGER REFERENCES clues(clue_id),
+	clue5_id INTEGER REFERENCES clues(clue_id),
+	clue6_id INTEGER REFERENCES clues(clue_id),
+	clue7_id INTEGER REFERENCES clues(clue_id),
+	clue8_id INTEGER REFERENCES clues(clue_id),
+	clue9_id INTEGER REFERENCES clues(clue_id),
+	clue10_id INTEGER REFERENCES clues(clue_id)
 );
 
 CREATE TABLE topics (
@@ -29,8 +64,7 @@ CREATE TABLE games (
 	score1 INTEGER NOT NULL,
 	score2 INTEGER NOT NULL,
 	turn1 INTEGER NOT NULL,
-	turn2 INTEGER NOT NULL,
-	clues TEXT NOT NULL
+	turn2 INTEGER NOT NULL
 );
 
 CREATE TABLE answers (
@@ -38,8 +72,10 @@ CREATE TABLE answers (
 	answer TEXT NOT NULL,
 	answer_type TEXT NOT NULL,
 	topic_id INTEGER REFERENCES topics(topic_id),
-	difficulty INTEGER NOT NULL,
-	media_id INTEGER REFERENCES media(media_id)
+	easy_id INTEGER REFERENCES answers_ext(id),
+	medium_id INTEGER REFERENCES answers_ext(id),
+	hard_id INTEGER REFERENCES answers_ext(id),
+	learn_more TEXT NOT NULL
 );
 
 CREATE TABLE clues (
@@ -50,8 +86,8 @@ CREATE TABLE clues (
 	answer_id INTEGER REFERENCES answers(answer_id)
 );
 
-CREATE TABLE media (
-	media_id INTEGER PRIMARY KEY,
+CREATE TABLE answers_ext (
+	id INTEGER PRIMARY KEY,
 	media TEXT NOT NULL,
 	type TEXT NOT NULL
 );

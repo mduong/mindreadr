@@ -21,6 +21,7 @@
 	<body>
 
 		<h2>Create Answers</h2>
+		<h3>All fields are required!</h3>
 		
 		<div id="create_answer">
 			<form id="answer_form" action="../actions/answers/create.php" method="POST" enctype="multipart/form-data">
@@ -36,6 +37,8 @@
 						<option value="Thing">Thing</option>
 						<option value="Idea">Idea</option>
 					</select>
+					<br />
+					<span class="bold">Learn more URL</span>: <input type="text" name="learn_more"/>
 				</p>
 				<p id="easy">
 					<span class="bold">Difficulty</span>: Easy<br />
