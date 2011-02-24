@@ -5,15 +5,15 @@
 	$db = new MindReadrDb();
 	
 	session_start();
-	
+
 	$game_id = $_GET["game_id"];
 	$team_id = $_GET["team_id"];
-	$user_id = $_SESSION["me"]["id"];
-	$teammate = json_decode($db->getTeammate($team_id, $user_id));
-	
+
 	if ($team = $db->getTeam($team_id)) {
 		$team = json_decode($team);
 	}
+	
+	$teammate = json_decode($db->getTeammate($team_id, $_SESSION["me"]["id"]));
 ?>
 
 <div data-role="page">
@@ -29,14 +29,16 @@
 				Score: <strong><?php echo $team->{"score"}; ?></strong>
 			</div>
 			<div class="ui-block-b">
-				<img src="https://graph.facebook.com/<?php echo $user_id; ?>/picture" />
+				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
 				<img src="https://graph.facebook.com/<?php echo $teammate->{"user_id"}; ?>/picture" />
 			</div>
 		</div><!-- /grid-a -->
-		<h3>Select a difficulty: </h3>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $team_id . ", " . $user_id; ?>, 1);">Easy</button>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $team_id . ", " . $user_id; ?>, 2);">Medium</button>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $team_id . ", " . $user_id; ?>, 3);">Hard</button>
+		<h3><?php echo $teammate->{"first_name"}; ?>'s turn</h3>
+		Your clue has been sent to <?php echo $teammate->{"first_name"}; ?>. Please wait for them to guess.
 	</div><!-- /content -->
+	
+	<div data-role="footer">
+		<h4>EDUC 196X</h4>
+	</div>
 
 </div><!-- /page -->

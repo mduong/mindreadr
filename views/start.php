@@ -28,10 +28,10 @@
 		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
 	</div><!-- /header -->
 
-	<div data-role="content">	
+	<div data-role="content"
 		<?php 
-			echo "You and " . $my_team->{"user2_name"} . " are playing against " . $opponent_team->{"user1_name"} . " and " . $opponent_team->{"user2_name"} . ".<br />";
-			echo "The topic is: " . $topic;
+			echo "You and <strong>" . $my_team->{"user2_name"} . "</strong> are playing against <strong>" . $opponent_team->{"user1_name"} . "</strong> and <strong>" . $opponent_team->{"user2_name"} . "</strong>.<br />";
+			echo "The topic is: <strong>" . $topic . "</strong>";
 		?>
 		<div data-inline="true">
 			<div id="start" data-role="button" onclick="createGame(<?php echo $_GET['topic_id']; ?>, <?php echo $_GET['team_id'];_?>, <?php echo $_GET['opponent_id']; ?>);">Start</div>

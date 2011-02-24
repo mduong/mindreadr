@@ -14,11 +14,12 @@ CREATE TABLE teams (
 	team_id INTEGER PRIMARY KEY,
 	user1_id INTEGER REFERENCES users(user_id),
 	user2_id INTEGER REFERENCES users(user_id),
+	game_id INTEGER DEFAULT 0,
+	turn INTEGER DEFAULT 0,
+	score INTEGER DEFAULT 0,
 	answers INTEGER REFERENCES team_answers(id),
 	clues INTEGER REFERENCES team_clues(id),
-	state1 INTEGER,
-	state2 INTEGER,
-	in_game INTEGER NOT NULL,
+	difficulty INTEGER,
 	UNIQUE(user1_id, user2_id)
 );
 
@@ -52,6 +53,13 @@ CREATE TABLE team_clues (
 	clue10_id INTEGER REFERENCES clues(clue_id)
 );
 
+CREATE TABLE states (
+	game_id INTEGER REFERENCES games(game_id) NOT NULL,
+	user_id INTEGER REFERENCES users(user_id) NOT NULL,
+	state INTEGER DEFAULT 0,
+	UNIQUE(game_id, user_id)
+);
+
 CREATE TABLE topics (
 	topic_id INTEGER PRIMARY KEY,
 	topic TEXT UNIQUE NOT NULL
@@ -60,11 +68,7 @@ CREATE TABLE topics (
 CREATE TABLE games (
 	game_id INTEGER PRIMARY KEY,
 	team1_id INTEGER REFERENCES teams(team_id),
-	team2_id INTEGER REFERENCES teams(team_id),
-	score1 INTEGER NOT NULL,
-	score2 INTEGER NOT NULL,
-	turn1 INTEGER NOT NULL,
-	turn2 INTEGER NOT NULL
+	team2_id INTEGER REFERENCES teams(team_id)
 );
 
 CREATE TABLE answers (
@@ -80,10 +84,19 @@ CREATE TABLE answers (
 
 CREATE TABLE clues (
 	clue_id INTEGER PRIMARY KEY,
+	clue TEXT NOT NULL,
 	game_id INTEGER REFERENCES games(game_id),
 	giver_id INTEGER REFERENCES users(user_id),
 	receiver_id INTEGER REFERENCES users(user_id),
-	answer_id INTEGER REFERENCES answers(answer_id)
+	answer_id INTEGER REFERENCES answers(answer_id),
+	points INTEGER NOT NULL
+);
+
+CREATE TABLE guesses (
+	guess_id INTEGER PRIMARY KEY,
+	game_id INTEGER REFERENCES games(game_id) NOT NULL,
+	user_id INTEGER REFERENCES users(user_id) NOT NULL,
+	guess TEXT NOT NULL
 );
 
 CREATE TABLE answers_ext (
