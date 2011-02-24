@@ -243,7 +243,7 @@ class MindReadrDb {
 		$user_id = sqlite_escape_string($user_id);
 		$state = sqlite_escape_string($state);
 		
-		if ($this->getState($game_id, $user_id) == $STATUS_NONE) {
+		if ($this->getState($game_id, $user_id) == $this>STATUS_NONE) {
 			$state_query = "INSERT INTO states(game_id, user_id, state) VALUES ('%d', '%d', '%d')";
 			$state_query = sprintf($state_query, $game_id, $user_id, $state);
 		} else {		
@@ -492,11 +492,11 @@ class MindReadrDb {
 		$team;
 		if ($result) {
 			$team = $result->fetch();
-			$user_query = "SELECT first_name FROM users WHERE user_id=" . $team["user1_id"];
+			$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user1_id"] . "'";
 			$result = $this->db_handle->query($user_query);
 			$user = $result->fetch();
 			$team["user1_name"] = $user["first_name"];
-			$user_query = "SELECT first_name FROM users WHERE user_id=" . $team["user2_id"];
+			$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user2_id"] . "'";
 			$result = $this->db_handle->query($user_query);
 			$user = $result->fetch();
 			$team["user2_name"] = $user["first_name"];
@@ -581,16 +581,55 @@ class MindReadrDb {
 		$this->setState($game_id, $teammate_id, $this->STATE_GUESS);
 	}
 
-	function validateGuess($team_id, $user_id, $clue_id, $guess, $points) {
+	function validateGuess($game_id, $team_id, $user_id, $clue_id, $guess, $points) {
+		$game_id = sqlite_escape_string($game_id);
 		$team_id = sqlite_escape_string($team_id);
 		$user_id = sqlite_escape_string($user_id);
 		$clue_id = sqlite_escape_string($clue_id);
 		$guess = sqlite_escape_string($guess);
 		$points = sqlite_escape_string($points);
 		
+		$answer_id = 0;
 		
+		$validate_query = "SELECT * FROM clues JOIN answers ON clues.answer_id=answers.answer_id WHERE clue_id='" . $clue_id . "'";
+		$result = $this->db_handle->query($validate_query);
+		if ($result) {
+			$result = $result->fetch();
+			$answer = $result["answers.answer"];
+			if (strcasecmp($guess, $answer) == 0) {
+				$answer_id = $result["answers.answer_id"];	
+				$teammate = json_decode($this->getTeammate($team_id, $user_id));
+				$teammate_id = $teammate->{"user_id"};
+				
+				$team = json_decode($this->getTeam($team_id));
+				$score = $team->{"score"} + points;
+				$turn = $team->{"turn"} + 1;
+				
+				$update_query = "UPDATE teams SET score='" . $score . "', turn='" . $turn . "' WHERE team_id='" . $team_id . "'";
+				$this->db_handle->queryExec($update_query);
+				
+				$this->setState($game_id, $user_id, $this->STATE_DONE_GUESS);
+				$this->setState($game_id, $teammate_id, $this->STATE_DIFFICULTY);
+			}
+		}
+		
+		$guess_query = "INSERT INTO guesses(game_id, user_id, answer_id, clue_id, guess) VALUES('%d', '%d', '%d', '%d', '%s')";
+		$guess_query = sprintf($guess_query, $game_id, $user_id, $answer_id, $clue_id, $guess);
+		$this->db_handle->queryExec($guess_query);
+		
+		return $answer_id;
 	}
 	
+	function getScore($team_id) {
+		$team_id = sqlite_escape_string($team_id);
+		$score_query = "SELECT score FROM teams WHERE team_id='" . $team_id . "'";
+		$result = $this->db_handle->query($score_query);
+		if ($result) {
+			$score = $result->fetch();
+			return $score["score"];
+		}
+		return 0;
+	}
 }
 
 ?>

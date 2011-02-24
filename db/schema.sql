@@ -96,6 +96,8 @@ CREATE TABLE guesses (
 	guess_id INTEGER PRIMARY KEY,
 	game_id INTEGER REFERENCES games(game_id) NOT NULL,
 	user_id INTEGER REFERENCES users(user_id) NOT NULL,
+	answer_id INTEGER REFERENCES answers(answer_id) NOT NULL,
+	clue_id INTEGER REFERENCES clues(clue_id) NOT NULL,
 	guess TEXT NOT NULL
 );
 
