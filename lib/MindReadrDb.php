@@ -243,7 +243,7 @@ class MindReadrDb {
 		$user_id = sqlite_escape_string($user_id);
 		$state = sqlite_escape_string($state);
 		
-		if ($this->getState($game_id, $user_id) == $this>STATUS_NONE) {
+		if ($this->getState($game_id, $user_id) == $this>STATE_NONE) {
 			$state_query = "INSERT INTO states(game_id, user_id, state) VALUES ('%d', '%d', '%d')";
 			$state_query = sprintf($state_query, $game_id, $user_id, $state);
 		} else {		
@@ -260,9 +260,9 @@ class MindReadrDb {
 		$result = $this->db_handle->query($state_query);
 		if ($result) {
 			$state = $result->fetch();
-			return $state["state" . $who];
+			return $state["state"] ? $state["state"] : $this->STATE_NONE;
 		}
-		return $STATUS_NONE;
+		return $this->STATE_NONE;
 	}
 	
 	function setDifficulty($game_id, $team_id, $user_id, $difficulty) {

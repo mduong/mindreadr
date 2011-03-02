@@ -12,6 +12,7 @@
 	<head>
 		<title>MindReadr</title>
 		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+		<link rel="stylesheet" href="lib/css/mindreadr.css" />
 		<script src="http://code.jquery.com/jquery-1.5.min.js"></script>
 		<script src="http://cgi.stanford.edu/~mduong/ed196x/lib/js/mindreadr.js"></script>
 		<script src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>

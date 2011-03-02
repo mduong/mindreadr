@@ -49,7 +49,9 @@
 			if ($answer->{"type"} == "text") {
 				echo '<p class="answer_text">' . $answer->{"media"} . '</p>';
 			} else if ($answer->{"type"} == "image") {
-				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="answer_img" />';
+				echo '<div class="clue_img">';
+				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="clue" />';
+				echo '</div>';
 			}
 		?>
 		<form action="../actions/games/submit_clue.php" method="get">
