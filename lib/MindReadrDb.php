@@ -203,6 +203,10 @@ class MindReadrDb {
 		$this->db_handle->queryExec($teams_query);
 	}
 	
+	/**
+	 * Gets the team turn for the given team, 0 if
+	 * error.
+	 */
 	function getTeamTurn($team_id) {
 		$team_id = sqlite_escape_string($team_id);
 		$turn_query = "SELECT turn FROM teams WHERE team_id='" . $team_id . "'";
@@ -214,6 +218,9 @@ class MindReadrDb {
 		return 0;
 	}
 	
+	/**
+	 * Sets the team turn for the given team.
+	 */
 	function setTeamTurn($team_id, $turn) {
 		$team_id = sqlite_escape_string($team_id);
 		$turn = sqlite_escape_string($turn);
@@ -221,6 +228,9 @@ class MindReadrDb {
 		$this->db_handle->queryExec($teams_query);
 	}
 	
+	/**
+	 * Sets the team score for the given team.
+	 */
 	function setTeamScore($team_id, $score) {
 		$team_id = sqlite_escape_string($team_id);
 		$score = sqlite_escape_string($score);
@@ -228,6 +238,10 @@ class MindReadrDb {
 		$this->db_handle->queryExec($teams_query);
 	}
 	
+	/**
+	 * Returns a JSON-encoded version of the game with
+	 * game_id.
+	 */
 	function getGame($game_id) {
 		$game_id = sqlite_escape_string($game_id);
 		$game_query = "SELECT * FROM games WHERE game_id='" . $game_id . "'";
@@ -238,12 +252,17 @@ class MindReadrDb {
 		return false;
 	}
 	
+	/**
+	 * Sets the user's state in the given game. Creates a
+	 * new state row in the DB if it does not already
+	 * exist.
+	 */
 	function setState($game_id, $user_id, $state) {
 		$game_id = sqlite_escape_string($game_id);
 		$user_id = sqlite_escape_string($user_id);
 		$state = sqlite_escape_string($state);
 		
-		if ($this->getState($game_id, $user_id) == $this>STATE_NONE) {
+		if ($this->getState($game_id, $user_id) == 0) {
 			$state_query = "INSERT INTO states(game_id, user_id, state) VALUES ('%d', '%d', '%d')";
 			$state_query = sprintf($state_query, $game_id, $user_id, $state);
 		} else {		
@@ -252,17 +271,21 @@ class MindReadrDb {
 		$this->db_handle->queryExec($state_query);
 	}
 	
+	/**
+	 * Gets the user's state in the given game. Returns 0 if
+	 * the DB entry does not exist.
+	 */
 	function getState($game_id, $user_id) {
 		$game_id = sqlite_escape_string($game_id);
 		$user_id = sqlite_escape_string($user_id);
 		
 		$state_query = "SELECT state FROM states WHERE game_id='" . $game_id . "' AND user_id='" . $user_id . "'";
 		$result = $this->db_handle->query($state_query);
-		if ($result) {
+		if ($result && sizeof($result) > 0) {
 			$state = $result->fetch();
-			return $state["state"] ? $state["state"] : $this->STATE_NONE;
+			return $state["state"];
 		}
-		return $this->STATE_NONE;
+		return 0;
 	}
 	
 	function setDifficulty($game_id, $team_id, $user_id, $difficulty) {
@@ -346,6 +369,17 @@ class MindReadrDb {
 		}
 		return false;
 	}
+	
+	function getAnswerReveal($answer_id) {
+		$answer_id = sqlite_escape_string($answer_id);
+		$answer_query = "SELECT answer FROM answers WHERE answer_id='" . $answer_id . "'";
+		$result = $this->db_handle->query($answer_query);
+		if ($result) {
+			$answer = $result->fetch();
+			return $answer["answer"];
+		}
+		return false;
+	}		
 	
 	function getClueNoId($team_id, $turn) {
 		$team_id = sqlite_escape_string($team_id);
@@ -608,8 +642,8 @@ class MindReadrDb {
 				$update_query = "UPDATE teams SET score='" . $score . "', turn='" . $turn . "' WHERE team_id='" . $team_id . "'";
 				$this->db_handle->queryExec($update_query);
 				
-				$this->setState($game_id, $user_id, $this->STATE_DONE_GUESS);
-				$this->setState($game_id, $teammate_id, $this->STATE_DIFFICULTY);
+				$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
+				$this->setState($game_id, $teammate_id, $this->STATE_DONE_GUESS);
 			}
 		}
 		

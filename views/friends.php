@@ -22,6 +22,7 @@
 	<div data-role="header">
 		<h1>Select a teammate</h1>
 		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
@@ -39,11 +40,12 @@
 						$last_letter = $letter;
 					}
 					if ($_GET["topic_id"]) {
-						echo '<li onclick="createTeam(' . $_GET["topic_id"] . ',' . $_SESSION["me"]["id"] . ',' . $fb_friend["id"] . ');">';
+						echo '<li onclick="createTeam(' . $_GET["topic_id"] . ',' . $_SESSION["me"]["id"] . ',' . $fb_friend["id"] . ');" class="ul-li-has-fb-img">';
 						echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
-						echo $fb_friend["name"];
+						echo '<h3>' . $fb_friend["name"] . '</h3>';
 					} else {
-						echo '<li>';
+						echo '<li class="ul-li-has-fb-img">';
+						echo '<img src="https://graph.facebook.com/' . $friend->{'friend2_id'} . '/picture" />';
 						echo '<h3>' . $fb_friend["name"] . '</h3>';
 					}
 					echo '</li>';

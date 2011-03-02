@@ -1,0 +1,13 @@
+img.clue {
+	text-align: center;
+	width: 100%;
+}
+
+.clue_img {
+	width: 300px;
+}
+
+.ul-li-has-fb-img {
+	min-height: 35px;
+	padding-left: 60px;
+}

@@ -16,10 +16,24 @@
 	}
 ?>
 
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MindReadr</title>
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+		<link rel="stylesheet" href="http://cgi.stanford.edu/~mduong/ed196x/lib/css/mindreadr.css" />
+		<script src="http://code.jquery.com/jquery-1.5.min.js"></script>
+		<script src="http://cgi.stanford.edu/~mduong/ed196x/lib/js/mindreadr.js"></script>
+		<script src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+	</head>
+	<body>
+
 <div data-role="page">
 
 	<div data-role="header">
 		<h1>MindReadr</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
@@ -40,3 +54,6 @@
 	</div><!-- /content -->
 
 </div><!-- /page -->
+
+</body>
+</html>

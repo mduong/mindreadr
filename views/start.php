@@ -26,6 +26,7 @@
 	<div data-role="header">
 		<h1>Start</h1>
 		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
 	<div data-role="content"

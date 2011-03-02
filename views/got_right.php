@@ -16,13 +16,15 @@
 		$team = json_decode($team);
 	}
 	
-	$answer = $db->getAnswer($answer_id, $team->{"difficulty"});
+	$answer = json_decode($db->getAnswer($answer_id, $team->{"difficulty"}));
 ?>
 
 <div data-role="page">
 
 	<div data-role="header">
 		<h1>MindReadr</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
@@ -41,9 +43,13 @@
 			if ($answer->{"type"} == "text") {
 				echo '<p class="answer_text">' . $answer->{"media"} . '</p>';
 			} else if ($answer->{"type"} == "image") {
-				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="answer_img" />';
+				echo '<div class="clue_img">';
+				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="clue" />';
+				echo '</div>';
 			}
 		?>
+		<p>Learn more about <a href="<?php echo $answer->{'learn_more'}; ?>" target="_blank"><?php echo $answer->{'answer'}; ?> </a>at Wikipedia.</p>
+		<div data-role="button" onclick="continueGame(<?php echo $game_id . ',' . $team_id; ?>);">Continue</div>
 	</div><!-- /content -->
 
 </div><!-- /page -->

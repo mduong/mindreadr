@@ -31,6 +31,8 @@
 
 	<div data-role="header">
 		<h1>MindReadr</h1>
+		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
@@ -54,6 +56,8 @@
 				echo '</div>';
 			}
 		?>
+		<div data-role="button" onclick="revealAnswer(<?php echo $answer->{'answer_id'}; ?>);" id="reveal_btn">Reveal answer</div>
+		<div id="answer_container"></div>
 		<form action="../actions/games/submit_clue.php" method="get">
 			<div data-role="fieldcontain">
 			    <label for="clue">Your clue:</label>

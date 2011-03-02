@@ -12,7 +12,7 @@
 	<head>
 		<title>MindReadr</title>
 		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
-		<link rel="stylesheet" href="lib/css/mindreadr.css" />
+		<link rel="stylesheet" href="http://cgi.stanford.edu/~mduong/ed196x/lib/css/mindreadr.css" />
 		<script src="http://code.jquery.com/jquery-1.5.min.js"></script>
 		<script src="http://cgi.stanford.edu/~mduong/ed196x/lib/js/mindreadr.js"></script>
 		<script src="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
@@ -21,6 +21,7 @@
 		<div data-role="page">
 			<div data-role="header">
 				<h1>MindReadr</h1>
+				<a href="<?php echo $facebook->getLogoutUrl(array('next' => 'http://cgi.stanford.edu/~mduong/ed196x/actions/account/logout.php')); ?>" class="ui-btn-right">Logout</a>
 			</div>
 			
 			<div data-role="content">
