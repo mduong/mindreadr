@@ -195,6 +195,18 @@ class MindReadrDb {
 		}
 		return json_encode($games);
 	}
+	
+	function getPendingGames($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		
+		$games_query = "SELECT DISTINCT T.team_id AS team_id, T.user1_id AS user1_id, T.user2_id AS user2_id, T.game_id AS game_id, T.team1_id AS team1_id, T.team2_id AS team2_id, T.difficulty AS difficulty, S.state AS state, T.turn AS turn, T.score AS score FROM (SELECT * FROM teams JOIN games ON teams.game_id=games.game_id) T JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON (T.user1_id=S.user_id OR T.user2_id=S.user_id) WHERE (T.user1_id='" . $user_id . "' OR T.user2_id='" . $user_id . "') AND (state='3' OR state='6')";
+		$result = $this->db_handle->query($games_query);
+		$games = array();
+		while ($game = $result->fetch()) {
+			$games[] = $game;
+		}
+		return json_encode($games);
+	}
 
 	function setTeamGameId($team_id, $game_id) {
 		$team_id = sqlite_escape_string($team_id);

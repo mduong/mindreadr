@@ -84,6 +84,24 @@
 						}
 					?>
 				</div>
+				<div id="clue_box" data-role="controlgroup">
+					<h3>Pending games</h3>
+					<?php
+						$games = json_decode($db->getPendingGames($_SESSION['me']['id']));
+						if (sizeof($games)) {
+							foreach($games as $game) {
+								$teammate = json_decode($db->getTeammate($game->{"team_id"}, $_SESSION['me']['id']));
+								if ($game->{"state"} == $db->STATE_DONE_CLUE) {
+									echo '<div data-role="button" onclick="$.mobile.changePage(\'views/given_wait.php?game_id=' . $game->{"game_id"}  . '&team_id=' . $game->{"team_id"} . '\');">Wait for ' . $teammate->{"first_name"} . ' to guess!</div>';
+								} else if ($game->{"state"} == $db->STATE_WAIT_CLUE) {
+									echo '<div data-role="button">Wait for ' . $teammate->{"first_name"} . '\'s clue!</div>';
+								}
+							}
+						} else {
+							echo 'No pending games!';
+						}
+					?>
+				</div>
 				<div data-role="controlgroup">
 					<h3>Menu</h3>
 					<a href="views/topics.php?play=friends" data-role="button">Play with Friends</a>

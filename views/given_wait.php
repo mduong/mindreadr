@@ -20,8 +20,7 @@
 
 	<div data-role="header">
 		<h1>MindReadr</h1>
-		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
-		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
+		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext" class="ui-btn-right"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
@@ -36,7 +35,7 @@
 			</div>
 		</div><!-- /grid-a -->
 		<h3><?php echo $teammate->{"first_name"}; ?>'s turn</h3>
-		Your clue has been sent to <?php echo $teammate->{"first_name"}; ?>. Please wait for them to guess.
+		Your clue has been sent to <?php echo $teammate->{"first_name"}; ?>. Please wait for <?php echo $teammate->{"first_name"}; ?> to guess.
 	</div><!-- /content -->
 	
 	<div data-role="footer">
