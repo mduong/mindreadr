@@ -655,7 +655,7 @@ class MindReadrDb {
 				$this->db_handle->queryExec($update_query);
 				
 				$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
-				$this->setState($game_id, $teammate_id, $this->STATE_DONE_GUESS);
+				$this->setState($game_id, $teammate_id, $this->STATE_WAIT_CLUE);
 			}
 		}
 		
