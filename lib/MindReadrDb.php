@@ -990,24 +990,24 @@ class MindReadrDb {
 			$result = $result->fetch();
 			$answer = $result["answers.answer"];
 			if (strcasecmp($guess, $answer) == 0) {
-				$answer_id = $result["answers.answer_id"];	
-				$opponent = json_decode($this->getOpponent($team_id, $user_id));
+				$answer_id = $result["answers.answer_id"];
+				$opponent = json_decode($this->getOpponent($game_id, $user_id));
 				$opponent_id = $opponent->{"user_id"};
 				
 				$game = json_decode($this->getGame($game_id));
 				$turn = $game->{"turn"} + 1;
 				
 				if ($user_id == $game->{"user1_id"}) {
-					$score = $game->{"score1"} + points;
+					$score = $game->{"score1"} + $points;
 					$update_query = "UPDATE games SET score1='" . $score . "', turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
 				} else if ($user_id == $game->{"user2_id"}) {
-					$score = $game->{"score2"} + points;
+					$score = $game->{"score2"} + $points;
 					$update_query = "UPDATE games SET score2='" . $score . "', turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
 				}
 				$this->db_handle->queryExec($update_query);
 				
 				$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
-				$this->setState($game_id, $opponent, $this->STATE_WAIT_CLUE);
+				$this->setState($game_id, $opponent_id, $this->STATE_WAIT_CLUE);
 			}
 		}
 		

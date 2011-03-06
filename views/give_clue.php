@@ -77,7 +77,7 @@
 		?>
 		<div data-role="button" onclick="revealAnswer(<?php echo $answer->{'answer_id'}; ?>);" id="reveal_btn">Reveal answer</div>
 		<div id="answer_container"></div>
-		<form action="../actions/games/submit_clue.php" method="get">
+		<form action="http://cgi.stanford.edu/~mduong/ed196x/actions/games/submit_clue.php" method="get">
 			<div data-role="fieldcontain">
 			    <label for="clue">Your clue:</label>
 			    <input type="text" name="clue" id="clue" value=""  />
