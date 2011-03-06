@@ -201,8 +201,8 @@ class MindReadrDb {
 		$user2_id = sqlite_escape_string($user2_id);
 		$topic_id = sqlite_escape_string($topic_id);
 		
-		$game_query = "INSERT INTO games(user1_id, user2_id, turn, score1, score2) VALUES ('%d', '%d', 1, 0, 0)";
-		$game_query = sprintf($game_query, $user1_id, $user2_id);
+		$game_query = "INSERT INTO games(user1_id, user2_id, topic_id, turn, score1, score2) VALUES ('%d', '%d', '%d', 1, 0, 0)";
+		$game_query = sprintf($game_query, $user1_id, $user2_id, $topic_id);
 		if ($this->db_handle->queryExec($game_query)) {
 			$game_id = $this->db_handle->lastInsertRowid();
 			
@@ -625,7 +625,14 @@ class MindReadrDb {
 		$clue_query = "SELECT * FROM clues WHERE clue_id='" . $clue_id . "'";
 		$result = $this->db_handle->query($clue_query);
 		if ($result) {
-			return json_encode($result->fetch());
+			$clue = $result->fetch();
+			$answer_query = "SELECT answer_type FROM answers WHERE answer_id='" . $clue["answer_id"] . "'";
+			$result = $this->db_handle->query($answer_query);
+			if ($result) {
+				$answer = $result->fetch();
+				$clue["answer_type"] = $answer["answer_type"];
+			}
+			return json_encode($clue);
 		}
 		return false;
 	}

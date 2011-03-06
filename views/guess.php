@@ -15,6 +15,8 @@
 		$game = json_decode($game);
 	}
 	
+	$topic = $db->getTopicName($game->{"topic_id"});
+	
 	if (!$clue_id) {
 		$clue = json_decode($db->getClueNoId($game_id, $turn));
 	} else {
@@ -54,17 +56,20 @@
 							echo $game->{"score1"};
 						}
 					?>
-				</strong>
+				</strong><br />
+				Topic: <strong><?php echo $topic; ?></strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
 				<img src="https://graph.facebook.com/<?php echo $opponent->{"user_id"}; ?>/picture" />
 			</div>
 		</div><!-- /grid-a -->
-		<h4>Clue:</h4>
-		<?php
-			echo '<p class="clue_text">' . $clue->{"clue"} . '</p>';
-		?>
+		<div>
+			<center><p>
+				Answer category: <h3><?php echo $clue->{"answer_type"}; ?></h3>
+				Clue: <h3><?php echo $clue->{"clue"}; ?></h3>
+			</p></center>
+		</div>
 		<form action="../actions/games/submit_guess.php" method="get">
 			<div data-role="fieldcontain">
 			    <label for="clue">Your guess:</label>
@@ -74,4 +79,7 @@
 		</form>
 	</div><!-- /content -->
 
+	<div data-role="footer">
+		<h4>EDUC 196X</h4>
+	</div><!-- /footer -->
 </div><!-- /page -->

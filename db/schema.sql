@@ -14,6 +14,7 @@ CREATE TABLE games (
 	game_id INTEGER PRIMARY KEY,
 	user1_id INTEGER REFERENCES users(user_id),
 	user2_id INTEGER REFERENCES users(user_id),
+	topic_id INTEGER REFERENCES topics(topic_id),
 	turn INTEGER DEFAULT 0,
 	score1 INTEGER DEFAULT 0,
 	score2 INTEGER DEFAULT 0,

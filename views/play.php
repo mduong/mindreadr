@@ -13,6 +13,8 @@
 	if ($game = $db->getGame($game_id)) {
 		$game = json_decode($game);
 	}
+	
+	$topic = $db->getTopicName($game->{"topic_id"});
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +58,8 @@
 							echo $game->{"score1"};
 						}
 					?>
-				</strong>
+				</strong><br />
+				Topic: <strong><?php echo $topic; ?></strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $user_id; ?>/picture" />

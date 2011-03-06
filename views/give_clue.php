@@ -16,6 +16,8 @@
 		$game = json_decode($game);
 	}
 	
+	$topic = $db->getTopicName($game->{"topic_id"});
+	
 	if (!$answer_id) {
 		$answer = json_decode($db->getAnswerNoId($game_id, $difficulty, $turn));
 	} else {	
@@ -55,7 +57,8 @@
 							echo $game->{"score1"};
 						}
 					?>
-				</strong>
+				</strong><br />
+				Topic: <strong><?php echo $topic; ?></strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
@@ -80,11 +83,14 @@
 			    <input type="text" name="clue" id="clue" value=""  />
 			</div>
 			<input type="hidden" name="game_id" value="<?php echo $game_id; ?>" />
-			<input type="hidden" name="answer_id" value="<?php echo $answer_id; ?>" />
+			<input type="hidden" name="answer_id" value="<?php echo $answer->{'answer_id'}; ?>" />
 			<input type="hidden" name="user_id" value="<?php echo $_SESSION["me"]["id"]; ?>" />
 			<input type="hidden" name="points" value="10" />
 			<input type="submit" value="Submit" />
 		</form>
 	</div><!-- /content -->
 
+	<div data-role="footer">
+		<h4>EDUC 196X</h4>
+	</div><!-- /footer -->
 </div><!-- /page -->
