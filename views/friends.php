@@ -32,7 +32,7 @@
 					echo "<h1>Friends</h1>";
 			?>
 		<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
-		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
+		<a href="http://cgi.stanford.edu/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext" rel="external" class="ui-btn-right"></a>
 	</div><!-- /header -->
 
 	<div data-role="content">
