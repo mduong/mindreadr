@@ -7,18 +7,17 @@
 	session_start();
 
 	$game_id = $_GET["game_id"];
-	$team_id = $_GET["team_id"];
 	$answer_id = $_GET["answer_id"];
 	$difficulty = $_GET["difficulty"];
 	$turn = $_GET["turn"];
-	$teammate = json_decode($db->getTeammate($team_id, $_SESSION["me"]["id"]));
+	$opponent = json_decode($db->getOpponent($game_id, $_SESSION["me"]["id"]));
 
-	if ($team = $db->getTeam($team_id)) {
-		$team = json_decode($team);
+	if ($game = $db->getGame($game_id)) {
+		$game = json_decode($game);
 	}
 	
 	if (!$answer_id) {
-		$answer = json_decode($db->getAnswerNoId($team_id, $difficulty, $turn));
+		$answer = json_decode($db->getAnswerNoId($game_id, $difficulty, $turn));
 	} else {	
 		$answer = $db->getAnswer($answer_id, $difficulty);
 		if ($answer) {
@@ -38,12 +37,29 @@
 	<div data-role="content">
 		<div class="ui-grid-a">
 			<div class="ui-block-a">
-				Turn: <strong><?php echo $team->{"turn"}; ?></strong><br />
-				Score: <strong><?php echo $team->{"score"}; ?></strong>
+				Turn: <strong><?php echo $game->{"turn"}; ?></strong><br />
+				Your Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score1"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score2"};
+						}
+					?>
+				</strong><br />
+				<?php echo $opponent->{"first_name"}; ?>'s Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score2"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score1"};
+						}
+					?>
+				</strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
-				<img src="https://graph.facebook.com/<?php echo $teammate->{"user_id"}; ?>/picture" />
+				<img src="https://graph.facebook.com/<?php echo $opponent->{"user_id"}; ?>/picture" />
 			</div>
 		</div><!-- /grid-a -->
 		<h3>Answer: </h3>
@@ -64,7 +80,6 @@
 			    <input type="text" name="clue" id="clue" value=""  />
 			</div>
 			<input type="hidden" name="game_id" value="<?php echo $game_id; ?>" />
-			<input type="hidden" name="team_id" value="<?php echo $team_id; ?>" />
 			<input type="hidden" name="answer_id" value="<?php echo $answer_id; ?>" />
 			<input type="hidden" name="user_id" value="<?php echo $_SESSION["me"]["id"]; ?>" />
 			<input type="hidden" name="points" value="10" />

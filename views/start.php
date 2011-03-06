@@ -7,8 +7,8 @@
 	session_start();
 	
 	$topic = $db->getTopicName($_GET["topic_id"]);
-	$my_team = json_decode($db->getTeam($_GET["team_id"])); // need to check if valid team
-	$opponent_team = json_decode($db->getTeam($_GET["opponent_id"]));
+	$user = json_decode($db->getUser($_SESSION["me"]["id"]));
+	$opponent = json_decode($db->getUser($_GET["opponent_id"]));
 ?>
 
 <!DOCTYPE html> 
@@ -29,13 +29,13 @@
 		<a href="/~mduong/ed196x/" data-role="button" data-icon="home" data-iconpos="notext"></a>
 	</div><!-- /header -->
 
-	<div data-role="content"
+	<div data-role="content">
 		<?php 
-			echo "You and <strong>" . $my_team->{"user2_name"} . "</strong> are playing against <strong>" . $opponent_team->{"user1_name"} . "</strong> and <strong>" . $opponent_team->{"user2_name"} . "</strong>.<br />";
+			echo "You are playing against <strong>" . $opponent->{"first_name"} . "</strong>.<br />";
 			echo "The topic is: <strong>" . $topic . "</strong>";
 		?>
 		<div data-inline="true">
-			<div id="start" data-role="button" onclick="createGame(<?php echo $_GET['topic_id']; ?>, <?php echo $_GET['team_id'];_?>, <?php echo $_GET['opponent_id']; ?>);">Start</div>
+			<div id="start" data-role="button" onclick="createGame(<?php echo $_GET['topic_id'] . ',' . $_SESSION["me"]["id"] . ',' . $_GET['opponent_id']; ?>);">Start</div>
 		</div>
 	</div><!-- /content -->
 

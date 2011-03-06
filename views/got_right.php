@@ -7,16 +7,15 @@
 	session_start();
 
 	$game_id = $_GET["game_id"];
-	$team_id = $_GET["team_id"];
 	$answer_id = $_GET["answer_id"];
 	
-	$teammate = json_decode($db->getTeammate($team_id, $_SESSION["me"]["id"]));
+	$opponent = json_decode($db->getOpponent($game_id, $_SESSION["me"]["id"]));
 
-	if ($team = $db->getTeam($team_id)) {
-		$team = json_decode($team);
+	if ($game = $db->getGame($game_id)) {
+		$game = json_decode($game);
 	}
 	
-	$answer = json_decode($db->getAnswer($answer_id, $team->{"difficulty"}));
+	$answer = json_decode($db->getAnswer($answer_id, $game->{"difficulty"}));
 ?>
 
 <div data-role="page">
@@ -30,15 +29,32 @@
 	<div data-role="content">
 		<div class="ui-grid-a">
 			<div class="ui-block-a">
-				Turn: <strong><?php echo $team->{"turn"}; ?></strong><br />
-				Score: <strong><?php echo $team->{"score"}; ?></strong>
+				Turn: <strong><?php echo $game->{"turn"}; ?></strong><br />
+				Your Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score1"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score2"};
+						}
+					?>
+				</strong><br />
+				<?php echo $opponent->{"first_name"}; ?>'s Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score2"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score1"};
+						}
+					?>
+				</strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
-				<img src="https://graph.facebook.com/<?php echo $teammate->{"user_id"}; ?>/picture" />
+				<img src="https://graph.facebook.com/<?php echo $opponent->{"user_id"}; ?>/picture" />
 			</div>
 		</div><!-- /grid-a -->
-		<h4>You got it! This is what <?php echo $teammate->{"first_name"}; ?> worked with:</h4>
+		<h4>You got it! This is what <?php echo $opponent->{"first_name"}; ?> worked with:</h4>
 		<?php
 			if ($answer->{"type"} == "text") {
 				echo '<p class="answer_text">' . $answer->{"media"} . '</p>';
@@ -49,7 +65,7 @@
 			}
 		?>
 		<p>Learn more about <a href="<?php echo $answer->{'learn_more'}; ?>" target="_blank"><?php echo $answer->{'answer'}; ?> </a>at Wikipedia.</p>
-		<div data-role="button" onclick="continueGame(<?php echo $game_id . ',' . $team_id; ?>);">Continue</div>
+		<div data-role="button" onclick="continueGame(<?php echo $game_id; ?>);">Continue</div>
 	</div><!-- /content -->
 
 </div><!-- /page -->

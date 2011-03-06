@@ -118,6 +118,17 @@ class MindReadrDb {
 		return 0;
 	}
 	
+	function getAnswersId($game_id) {
+		$team_id = sqlite_escape_string($game_id);
+		$answers_query = "SELECT answers FROM games WHERE game_id='" . $team_id . "'";
+		$result = $this->db_handle->query($answers_query);
+		if ($result) {
+			$answers = $result->fetch();
+			return $answers["answers"];
+		}
+		return 0;
+	}
+	
 	function getTeamCluesId($team_id) {
 		$team_id = sqlite_escape_string($team_id);
 		$clues_query = "SELECT clues FROM teams WHERE team_id='" . $team_id . "'";
@@ -129,9 +140,21 @@ class MindReadrDb {
 		return 0;
 	}
 	
+	function getCluesId($game_id) {
+		$team_id = sqlite_escape_string($game_id);
+		$clues_query = "SELECT clues FROM games WHERE game_id='" . $game_id . "'";
+		$result = $this->db_handle->query($clues_query);
+		if ($result) {
+			$clues = $result->fetch();
+			return $clues["clues"];
+		}
+		return 0;
+	}
+	
 /**
  * Games
- */		
+ */
+ /*
 	function createGame($team1_id, $team2_id, $topic_id) {
 		$team1_id = sqlite_escape_string($team1_id);
 		$team2_id = sqlite_escape_string($team2_id);
@@ -171,8 +194,34 @@ class MindReadrDb {
 		}
 		return false;
 	}
+*/
+		
+	function createGame($user1_id, $user2_id, $topic_id) {
+		$user1_id = sqlite_escape_string($user1_id);
+		$user2_id = sqlite_escape_string($user2_id);
+		$topic_id = sqlite_escape_string($topic_id);
+		
+		$game_query = "INSERT INTO games(user1_id, user2_id, turn, score1, score2) VALUES ('%d', '%d', 1, 0, 0)";
+		$game_query = sprintf($game_query, $user1_id, $user2_id);
+		if ($this->db_handle->queryExec($game_query)) {
+			$game_id = $this->db_handle->lastInsertRowid();
+			
+			$this->clearAnswers($game_id);
+			$this->clearClues($game_id);
+			
+			$answers = $this->getTopicAnswers($topic_id);
+			$answers = array_splice($answers, 0, 10);
+			$this->addAnswers($game_id, $answers);
+			
+			$this->setState($game_id, $user1_id, $this->STATE_DIFFICULTY);
+			$this->setState($game_id, $user2_id, $this->STATE_WAIT_CLUE);
+			
+			return $game_id;
+		}
+		return false;
+	}
 
-	function getGiveClueGames($user_id) {
+	/*function getGiveClueGames($user_id) {
 		$user_id = sqlite_escape_string($user_id);
 		
 		$games_query = "SELECT DISTINCT T.team_id AS team_id, T.user1_id AS user1_id, T.user2_id AS user2_id, T.game_id AS game_id, T.team1_id AS team1_id, T.team2_id AS team2_id, T.difficulty AS difficulty, S.state AS state, T.turn AS turn, T.score AS score FROM (SELECT * FROM teams JOIN games ON teams.game_id=games.game_id) T JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON (T.user1_id=S.user_id OR T.user2_id=S.user_id) WHERE (T.user1_id='" . $user_id . "' OR T.user2_id='" . $user_id . "') AND (state='1' OR state='2')";
@@ -182,9 +231,21 @@ class MindReadrDb {
 			$games[] = $game;
 		}
 		return json_encode($games);
+	}*/
+	
+	function getGiveClueGames($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		
+		$games_query = "SELECT DISTINCT G.game_id AS game_id, G.user1_id AS user1_id, G.user2_id AS user2_id, G.difficulty AS difficulty, S.state AS state, G.turn AS turn, G.score1 AS score1, G.score2 AS score2 FROM (SELECT * FROM games) G JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON ((G.user1_id=S.user_id OR G.user2_id=S.user_id) AND G.game_id=S.game_id) WHERE (G.user1_id='" . $user_id . "' OR G.user2_id='" . $user_id . "') AND (state='1' OR state='2')";
+		$result = $this->db_handle->query($games_query);
+		$games = array();
+		while ($game = $result->fetch()) {
+			$games[] = $game;
+		}
+		return json_encode($games);
 	}
 	
-	function getGuessAnswerGames($user_id) {
+	/*function getGuessAnswerGames($user_id) {
 		$user_id = sqlite_escape_string($user_id);
 		
 		$games_query = "SELECT DISTINCT T.team_id AS team_id, T.user1_id AS user1_id, T.user2_id AS user2_id, T.game_id AS game_id, T.team1_id AS team1_id, T.team2_id AS team2_id, T.difficulty AS difficulty, S.state AS state, T.turn AS turn, T.score AS score FROM (SELECT * FROM teams JOIN games ON teams.game_id=games.game_id) T JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON (T.user1_id=S.user_id OR T.user2_id=S.user_id) WHERE (T.user1_id='" . $user_id . "' OR T.user2_id='" . $user_id . "') AND state='4'";
@@ -194,12 +255,36 @@ class MindReadrDb {
 			$games[] = $game;
 		}
 		return json_encode($games);
+	}*/
+	
+	function getGuessAnswerGames($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		
+		$games_query = "SELECT DISTINCT G.game_id AS game_id, G.user1_id AS user1_id, G.user2_id AS user2_id, G.difficulty AS difficulty, S.state AS state, G.turn AS turn, G.score1 AS score1, G.score2 AS score2 FROM (SELECT * FROM games) G JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON ((G.user1_id=S.user_id OR G.user2_id=S.user_id) AND G.game_id=S.game_id) WHERE (G.user1_id='" . $user_id . "' OR G.user2_id='" . $user_id . "') AND state='4'";
+		$result = $this->db_handle->query($games_query);
+		$games = array();
+		while ($game = $result->fetch()) {
+			$games[] = $game;
+		}
+		return json_encode($games);
 	}
+	
+	/*function getPendingGames($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		
+		$games_query = "SELECT DISTINCT T.team_id AS team_id, T.user1_id AS user1_id, T.user2_id AS user2_id, T.game_id AS game_id, T.team1_id AS team1_id, T.team2_id AS team2_id, T.difficulty AS difficulty, S.state AS state, T.turn AS turn, T.score AS score FROM (SELECT * FROM teams JOIN games ON teams.game_id=games.game_id) T JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON (T.user1_id=S.user_id OR T.user2_id=S.user_id) WHERE (T.user1_id='" . $user_id . "' OR T.user2_id='" . $user_id . "') AND (state='3' OR state='6')";
+		$result = $this->db_handle->query($games_query);
+		$games = array();
+		while ($game = $result->fetch()) {
+			$games[] = $game;
+		}
+		return json_encode($games);
+	}*/
 	
 	function getPendingGames($user_id) {
 		$user_id = sqlite_escape_string($user_id);
 		
-		$games_query = "SELECT DISTINCT T.team_id AS team_id, T.user1_id AS user1_id, T.user2_id AS user2_id, T.game_id AS game_id, T.team1_id AS team1_id, T.team2_id AS team2_id, T.difficulty AS difficulty, S.state AS state, T.turn AS turn, T.score AS score FROM (SELECT * FROM teams JOIN games ON teams.game_id=games.game_id) T JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON (T.user1_id=S.user_id OR T.user2_id=S.user_id) WHERE (T.user1_id='" . $user_id . "' OR T.user2_id='" . $user_id . "') AND (state='3' OR state='6')";
+		$games_query = "SELECT DISTINCT G.game_id AS game_id, G.user1_id AS user1_id, G.user2_id AS user2_id, G.difficulty AS difficulty, S.state AS state, G.turn AS turn, G.score1 AS score1, G.score2 AS score2 FROM (SELECT * FROM games) G JOIN (SELECT * FROM states WHERE user_id='" . $user_id . "') S ON ((G.user1_id=S.user_id OR G.user2_id=S.user_id) AND G.game_id=S.game_id) WHERE (G.user1_id='" . $user_id . "' OR G.user2_id='" . $user_id . "') AND (state='3' OR state='6')";
 		$result = $this->db_handle->query($games_query);
 		$games = array();
 		while ($game = $result->fetch()) {
@@ -219,9 +304,20 @@ class MindReadrDb {
 	 * Gets the team turn for the given team, 0 if
 	 * error.
 	 */
-	function getTeamTurn($team_id) {
+	/*function getTeamTurn($team_id) {
 		$team_id = sqlite_escape_string($team_id);
 		$turn_query = "SELECT turn FROM teams WHERE team_id='" . $team_id . "'";
+		$result = $this->db_handle->query($turn_query);
+		if ($result) {
+			$turn = $result->fetch();
+			return $turn["turn"];
+		}
+		return 0;
+	}*/
+	
+	function getTurn($game_id) {
+		$game_id = sqlite_escape_string($game_id);
+		$turn_query = "SELECT turn FROM games WHERE game_id='" . $game_id . "'";
 		$result = $this->db_handle->query($turn_query);
 		if ($result) {
 			$turn = $result->fetch();
@@ -233,21 +329,43 @@ class MindReadrDb {
 	/**
 	 * Sets the team turn for the given team.
 	 */
-	function setTeamTurn($team_id, $turn) {
+	/*function setTeamTurn($team_id, $turn) {
 		$team_id = sqlite_escape_string($team_id);
 		$turn = sqlite_escape_string($turn);
 		$teams_query = "UPDATE teams SET turn='" . $turn . "' WHERE team_id='" . $team_id . "'";
 		$this->db_handle->queryExec($teams_query);
+	}*/
+	
+	function setTurn($game_id, $turn) {
+		$game_id = sqlite_escape_string($game_id);
+		$turn = sqlite_escape_string($turn);
+		$game_query = "UPDATE games SET turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
+		$this->db_handle->queryExec($tgame_query);
 	}
 	
 	/**
 	 * Sets the team score for the given team.
 	 */
-	function setTeamScore($team_id, $score) {
+	/*function setTeamScore($team_id, $score) {
 		$team_id = sqlite_escape_string($team_id);
 		$score = sqlite_escape_string($score);
 		$teams_query = "UPDATE teams SET score='" . $score . "' WHERE team_id='" . $team_id . "'";
 		$this->db_handle->queryExec($teams_query);
+	}*/
+	
+	function setScore($game_id, $user_id, $score) {
+		$game_id = sqlite_escape_string($game_id);
+		$user_id = sqlite_escape_string($user_id);
+		$score = sqlite_escape_string($score);
+		
+		$game = json_decode($this->getGame($game_id));
+		
+		if ($user_id == $game->{"user1_id"}) {
+			$game_query = "UPDATE games SET score1='" . $score . "' WHERE game_id='" . $game_id . "'";
+		} else if ($user_id == $game->{"user2_id"}) {
+			$game_query = "UPDATE games SET score2='" . $score . "' WHERE game_id='" . $game_id . "'";
+		}
+		$this->db_handle->queryExec($game_query);
 	}
 	
 	/**
@@ -259,9 +377,17 @@ class MindReadrDb {
 		$game_query = "SELECT * FROM games WHERE game_id='" . $game_id . "'";
 		$result = $this->db_handle->query($game_query);
 		if ($result) {
-			return json_encode($result->fetch());
+			$game = $result->fetch();
+			$user_query = "SELECT first_name FROM users WHERE user_id='" . $game["user1_id"] . "'";
+			$result = $this->db_handle->query($user_query);
+			$user = $result->fetch();
+			$game["user1_name"] = $user["first_name"];
+			$user_query = "SELECT first_name FROM users WHERE user_id='" . $game["user2_id"] . "'";
+			$result = $this->db_handle->query($user_query);
+			$user = $result->fetch();
+			$game["user2_name"] = $user["first_name"];
 		}
-		return false;
+		return json_encode($game);
 	}
 	
 	/**
@@ -300,7 +426,7 @@ class MindReadrDb {
 		return 0;
 	}
 	
-	function setDifficulty($game_id, $team_id, $user_id, $difficulty) {
+	/*function setDifficulty($game_id, $team_id, $user_id, $difficulty) {
 		$game_id = sqlite_escape_string($game_id);
 		$team_id = sqlite_escape_string($team_id);
 		$user_id = sqlite_escape_string($user_id);
@@ -325,9 +451,62 @@ class MindReadrDb {
 				return $answer_id;
 			}
 		}
+	}*/
+	
+	// function setDifficulty($game_id, $team_id, $user_id, $difficulty) {
+	// 	$game_id = sqlite_escape_string($game_id);
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$user_id = sqlite_escape_string($user_id);
+	// 	$difficulty = sqlite_escape_string($difficulty);
+	// 	
+	// 	$query = "UPDATE games SET difficulty='%d' WHERE game_id='%d'";
+	// 	$query = sprintf($query, $difficulty, $team_id);
+	// 	$this->db_handle->queryExec($query);
+	// 	
+	// 	$query = "SELECT * FROM games WHERE game_id='" . $game_id . "'";
+	// 	$result = $this->db_handle->query($query);
+	// 	if ($result) {
+	// 		$team = $result->fetch();
+	// 		$answers = $team["answers"];
+	// 		$turn = $team["turn"];
+	// 		$query = "SELECT answer" . $turn . "_id FROM game_answers WHERE id='" . $answers . "'";
+	// 		$result = $this->db_handle->query($query);
+	// 		if ($result) {
+	// 			$answer_id = $result->fetch();
+	// 			$answer_id = $answer_id["answer" . $turn . "_id"];
+	// 			$this->setState($game_id, $user_id, $this->STATE_GIVE_CLUE);
+	// 			return $answer_id;
+	// 		}
+	// 	}
+	// }
+	
+	function setDifficulty($game_id, $user_id, $difficulty) {
+		$game_id = sqlite_escape_string($game_id);
+		$user_id = sqlite_escape_string($user_id);
+		$difficulty = sqlite_escape_string($difficulty);
+		
+		$query = "UPDATE games SET difficulty='%d' WHERE game_id='%d'";
+		$query = sprintf($query, $difficulty, $game_id);
+		$this->db_handle->queryExec($query);
+		
+		$query = "SELECT * FROM games WHERE game_id='" . $game_id . "'";
+		$result = $this->db_handle->query($query);
+		if ($result) {
+			$game = $result->fetch();
+			$answers = $game["answers"];
+			$turn = $game["turn"];
+			$query = "SELECT answer" . $turn . "_id FROM game_answers WHERE id='" . $answers . "'";
+			$result = $this->db_handle->query($query);
+			if ($result) {
+				$answer_id = $result->fetch();
+				$answer_id = $answer_id["answer" . $turn . "_id"];
+				$this->setState($game_id, $user_id, $this->STATE_GIVE_CLUE);
+				return $answer_id;
+			}
+		}
 	}
 	
-	function addTeamAnswers($team_id, $answers) {
+	/*function addTeamAnswers($team_id, $answers) {
 		$team_id = sqlite_escape_string($team_id);
 		foreach ($answers as $answer) {
 			foreach($answer as $k => $v) {
@@ -345,14 +524,34 @@ class MindReadrDb {
 		$answers_query .= "WHERE team_id='" . $team_id . "'";
 		
 		$this->db_handle->queryExec($answers_query);
+	}*/
+	
+	function addAnswers($game_id, $answers) {
+		$game_id = sqlite_escape_string($game_id);
+		foreach ($answers as $answer) {
+			foreach($answer as $k => $v) {
+				$answer[$k] = sqlite_escape_string($v);
+			}
+		}
+		
+		$answers_query = "UPDATE game_answers SET ";
+		foreach ($answers as $k => $v) {
+			if ($k != 0) {
+				$answers_query .= ", ";
+			}
+			$answers_query .= "answer" . ($k + 1) . "_id='" . $answers[$k]["answer_id"] . "' ";
+		}
+		$answers_query .= "WHERE game_id='" . $game_id . "'";
+		
+		$this->db_handle->queryExec($answers_query);
 	}
 	
-	function getAnswerNoId($team_id, $difficulty, $turn) {
-		$team_id = sqlite_escape_string($team_id);
+	function getAnswerNoId($game_id, $difficulty, $turn) {
+		$game_id = sqlite_escape_string($game_id);
 		$difficulty = sqlite_escape_string($difficulty);
 		$turn = sqlite_escape_string($turn);
 		
-		$answer_query = "SELECT team_answers.answer" . $turn . "_id AS answer_id FROM team_answers JOIN teams ON teams.team_id=team_answers.team_id WHERE teams.team_id='" . $team_id . "'";
+		$answer_query = "SELECT game_answers.answer" . $turn . "_id AS answer_id FROM game_answers JOIN games ON games.game_id=game_answers.game_id WHERE games.gamE_id='" . $game_id . "'";
 		$result = $this->db_handle->query($answer_query);
 		if ($result) {
 			$answer = $result->fetch();
@@ -393,11 +592,25 @@ class MindReadrDb {
 		return false;
 	}		
 	
-	function getClueNoId($team_id, $turn) {
+/*	function getClueNoId($team_id, $turn) {
 		$team_id = sqlite_escape_string($team_id);
 		$turn = sqlite_escape_string($turn);
 		
 		$clue_query = "SELECT team_clues.clue" . $turn . "_id AS clue_id FROM team_clues JOIN teams ON teams.team_id=team_clues.team_id WHERE teams.team_id='" . $team_id . "'";
+		$result = $this->db_handle->query($clue_query);
+		if ($result) {
+			$clue = $result->fetch();
+			$clue_id = $clue["clue_id"];
+			return $this->getClue($clue_id);
+		}
+		return 0;
+	}*/
+	
+	function getClueNoId($game_id, $turn) {
+		$game_id = sqlite_escape_string($game_id);
+		$turn = sqlite_escape_string($turn);
+		
+		$clue_query = "SELECT game_clues.clue" . $turn . "_id AS clue_id FROM game_clues JOIN games ON games.game_id=game_clues.game_id WHERE games.game_id='" . $game_id . "'";
 		$result = $this->db_handle->query($clue_query);
 		if ($result) {
 			$clue = $result->fetch();
@@ -417,7 +630,7 @@ class MindReadrDb {
 		return false;
 	}
 
-	function clearTeamAnswers($team_id) {
+	/*function clearTeamAnswers($team_id) {
 		$answers_id = $this->getTeamAnswersId($team_id);
 		if ($answers_id) {
 			$answers_query = "UPDATE teams SET answers=NULL WHERE team_id='" . $team_id . "'; DELETE FROM team_answers WHERE id='" . $answers_id . "'";
@@ -428,18 +641,44 @@ class MindReadrDb {
 		$answers_id = $this->db_handle->lastInsertRowid();
 		$answers_query = "UPDATE teams SET answers='" . $answers_id . "' WHERE team_id='" . $team_id . "'";
 		$this->db_handle->queryExec($answers_query);
+	}*/
+	
+	function clearAnswers($game_id) {
+		$answers_id = $this->getAnswersId($game_id);
+		if ($answers_id) {
+			$answers_query = "UPDATE games SET answers=NULL WHERE game_id='" . $game_id . "'; DELETE FROM game_answers WHERE id='" . $answers_id . "'";
+			$this->db_handle->queryExec($answers_query);
+		}
+		$answers_query = "INSERT INTO game_answers(game_id) VALUES ('" . $game_id . "')";
+		$this->db_handle->queryExec($answers_query);
+		$answers_id = $this->db_handle->lastInsertRowid();
+		$answers_query = "UPDATE games SET answers='" . $answers_id . "' WHERE game_id='" . $game_id . "'";
+		$this->db_handle->queryExec($answers_query);
 	}
 	
-	function clearTeamClues($team_id) {			
-		$clues_id = $this->getTeamCluesId($team_id);
+	// function clearTeamClues($team_id) {			
+	// 	$clues_id = $this->getTeamCluesId($team_id);
+	// 	if ($clues_id) {
+	// 		$clues_query = "UPDATE teams SET clues=NULL WHERE team_id='" . $team_id . "'; DELETE FROM team_clues WHERE team_id='" . $team_id . "'";
+	// 		$this->db_handle->queryExec($clues_query);
+	// 	}
+	// 	$clues_query = "INSERT INTO team_clues(team_id) VALUES ('" . $team_id . "')";
+	// 	$this->db_handle->queryExec($clues_query);
+	// 	$clues_id = $this->db_handle->lastInsertRowid();
+	// 	$clues_query = "UPDATE teams SET clues='" . $clues_id . "' WHERE team_id='" . $team_id . "'";
+	// 	$this->db_handle->queryExec($clues_query);
+	// }
+
+	function clearClues($game_id) {			
+		$clues_id = $this->getTeamCluesId($game_id);
 		if ($clues_id) {
-			$clues_query = "UPDATE teams SET clues=NULL WHERE team_id='" . $team_id . "'; DELETE FROM team_clues WHERE team_id='" . $team_id . "'";
+			$clues_query = "UPDATE games SET clues=NULL WHERE game_id='" . $game_id . "'; DELETE FROM game_clues WHERE game_id='" . $game_id . "'";
 			$this->db_handle->queryExec($clues_query);
 		}
-		$clues_query = "INSERT INTO team_clues(team_id) VALUES ('" . $team_id . "')";
+		$clues_query = "INSERT INTO game_clues(game_id) VALUES ('" . $game_id . "')";
 		$this->db_handle->queryExec($clues_query);
 		$clues_id = $this->db_handle->lastInsertRowid();
-		$clues_query = "UPDATE teams SET clues='" . $clues_id . "' WHERE team_id='" . $team_id . "'";
+		$clues_query = "UPDATE games SET clues='" . $clues_id . "' WHERE game_id='" . $game_id . "'";
 		$this->db_handle->queryExec($clues_query);
 	}
 	
@@ -472,92 +711,132 @@ class MindReadrDb {
 		return json_encode($friends);
 	}
 	
-	function teamExists($user1_id, $user2_id) {
+	function getPossibleOpponents($user_id) {
+		$user_id = sqlite_escape_string($user_id);
+		$opponents_query = "SELECT friend2_id FROM friends JOIN users ON friend2_id=user_id WHERE friend1_id='" . $user_id . "' AND friend2_id NOT IN (SELECT user1_id AS friend2_id FROM games WHERE user2_id='" . $user_id . "' UNION SELECT user2_id AS friend2_id FROM games WHERE user1_id='" . $user_id . "') ORDER BY first_name";
+		$result =  $this->db_handle->query($opponents_query);
+		$opponents = array();
+		if ($result) {
+			while ($opponent = $result->fetch()) {
+				$opponents[] = $opponent;
+			}
+		}
+		return json_encode($opponents);
+	}
+	
+	// function teamExists($user1_id, $user2_id) {
+	// 	$user1_id = sqlite_escape_string($user1_id);
+	// 	$user2_id = sqlite_escape_string($user2_id);
+	// 	$team_query = "SELECT * FROM teams WHERE (user1_id='%d' AND user2_id='%d') OR (user1_id='%d' AND user2_id='%d')";
+	// 	$team_query = sprintf($team_query, $user1_id, $user2_id, $user2_id, $user1_id);
+	// 	if ($result = $this->db_handle->query($team_query)) {
+	// 		if ($result->numRows() > 0) {
+	// 			$team = $result->fetch();
+	// 			return $team["team_id"];
+	// 		}
+	// 	}
+	// 	return false;
+	// }
+	
+	function gameExists($user1_id, $user2_id) {
 		$user1_id = sqlite_escape_string($user1_id);
 		$user2_id = sqlite_escape_string($user2_id);
-		$team_query = "SELECT * FROM teams WHERE (user1_id='%d' AND user2_id='%d') OR (user1_id='%d' AND user2_id='%d')";
-		$team_query = sprintf($team_query, $user1_id, $user2_id, $user2_id, $user1_id);
-		if ($result = $this->db_handle->query($team_query)) {
+		$game_query = "SELECT * FROM games WHERE (user1_id='%d' AND user2_id='%d') OR (user1_id='%d' AND user2_id='%d')";
+		$game_query = sprintf($game_query, $user1_id, $user2_id, $user2_id, $user1_id);
+		if ($result = $this->db_handle->query($game_query)) {
 			if ($result->numRows() > 0) {
-				$team = $result->fetch();
-				return $team["team_id"];
+				$game = $result->fetch();
+				return $game["game_id"];
 			}
 		}
 		return false;
 	}
 	
-	function createTeam($user1_id, $user2_id) {
-		$user1_id = sqlite_escape_string($user1_id);
-		$user2_id = sqlite_escape_string($user2_id);
-		$team_query = "INSERT INTO teams(user1_id, user2_id) VALUES ('%d', '%d'); ";
-		$team_query = sprintf($team_query, $user1_id, $user2_id);
-		return $this->db_handle->queryExec($team_query);
-	}
+	// function createTeam($user1_id, $user2_id) {
+	// 	$user1_id = sqlite_escape_string($user1_id);
+	// 	$user2_id = sqlite_escape_string($user2_id);
+	// 	$team_query = "INSERT INTO teams(user1_id, user2_id) VALUES ('%d', '%d'); ";
+	// 	$team_query = sprintf($team_query, $user1_id, $user2_id);
+	// 	return $this->db_handle->queryExec($team_query);
+	// }
 	
-	function getUserTeams($user_id) {
-		$user_id = sqlite_escape_string($user_id);
-		$team_query = "SELECT * FROM teams WHERE user1_id='" . $user_id . "' OR user2_id='" . $user_id . "'";
-		$result = $this->db_handle->query($team_query);
-		$teams = array();
-		if ($result) {
-			while ($row = $result->fetch()) {
-				$teams[] = $row;
-			}
-		}
-		return json_encode($teams);
-	}
+	// function getUserTeams($user_id) {
+	// 	$user_id = sqlite_escape_string($user_id);
+	// 	$team_query = "SELECT * FROM teams WHERE user1_id='" . $user_id . "' OR user2_id='" . $user_id . "'";
+	// 	$result = $this->db_handle->query($team_query);
+	// 	$teams = array();
+	// 	if ($result) {
+	// 		while ($row = $result->fetch()) {
+	// 			$teams[] = $row;
+	// 		}
+	// 	}
+	// 	return json_encode($teams);
+	// }
 	
-	function getPotentialTeams($team_id, $user1_id, $user2_id) {
-		$team_id = sqlite_escape_string($team_id);
-		$user1_id = sqlite_escape_string($user1_id);
-		$user2_id = sqlite_escape_string($user2_id);
-		$team_query = "SELECT * FROM teams WHERE team_id<>'%d' AND user1_id<>'%d' AND user2_id<>'%d' AND user1_id<>'%d' AND user2_id<>'%d'";
-		$team_query = sprintf($team_query, $team_id, $user1_id, $user2_id, $user2_id, $user1_id);
-		$result = $this->db_handle->query($team_query);
-		$teams = array();
-		if ($result) {
-			while ($row = $result->fetch()) {
-				$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user1_id"];
-				$result = $this->db_handle->query($user_query);
-				$user = $result->fetch();
-				$row["user1_name"] = $user["first_name"];
-				$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user2_id"];
-				$result = $this->db_handle->query($user_query);
-				$user = $result->fetch();
-				$row["user2_name"] = $user["first_name"];
-				$teams[] = $row;
-			}
-		}
-		return json_encode($teams);
-	}
+	// function getPotentialTeams($team_id, $user1_id, $user2_id) {
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$user1_id = sqlite_escape_string($user1_id);
+	// 	$user2_id = sqlite_escape_string($user2_id);
+	// 	$team_query = "SELECT * FROM teams WHERE team_id<>'%d' AND user1_id<>'%d' AND user2_id<>'%d' AND user1_id<>'%d' AND user2_id<>'%d'";
+	// 	$team_query = sprintf($team_query, $team_id, $user1_id, $user2_id, $user2_id, $user1_id);
+	// 	$result = $this->db_handle->query($team_query);
+	// 	$teams = array();
+	// 	if ($result) {
+	// 		while ($row = $result->fetch()) {
+	// 			$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user1_id"];
+	// 			$result = $this->db_handle->query($user_query);
+	// 			$user = $result->fetch();
+	// 			$row["user1_name"] = $user["first_name"];
+	// 			$user_query = "SELECT first_name FROM users WHERE user_id=" . $row["user2_id"];
+	// 			$result = $this->db_handle->query($user_query);
+	// 			$user = $result->fetch();
+	// 			$row["user2_name"] = $user["first_name"];
+	// 			$teams[] = $row;
+	// 		}
+	// 	}
+	// 	return json_encode($teams);
+	// }
 
-	function getTeam($team_id) {
-		$team_id = sqlite_escape_string($team_id);
-		$team_query = "SELECT * FROM teams where team_id='" . $team_id . "'";
-		$result = $this->db_handle->query($team_query);
-		$team;
-		if ($result) {
-			$team = $result->fetch();
-			$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user1_id"] . "'";
-			$result = $this->db_handle->query($user_query);
-			$user = $result->fetch();
-			$team["user1_name"] = $user["first_name"];
-			$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user2_id"] . "'";
-			$result = $this->db_handle->query($user_query);
-			$user = $result->fetch();
-			$team["user2_name"] = $user["first_name"];
-		}
-		return json_encode($team);
-	}
+	// function getTeam($team_id) {
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$team_query = "SELECT * FROM teams where team_id='" . $team_id . "'";
+	// 	$result = $this->db_handle->query($team_query);
+	// 	$team;
+	// 	if ($result) {
+	// 		$team = $result->fetch();
+	// 		$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user1_id"] . "'";
+	// 		$result = $this->db_handle->query($user_query);
+	// 		$user = $result->fetch();
+	// 		$team["user1_name"] = $user["first_name"];
+	// 		$user_query = "SELECT first_name FROM users WHERE user_id='" . $team["user2_id"] . "'";
+	// 		$result = $this->db_handle->query($user_query);
+	// 		$user = $result->fetch();
+	// 		$team["user2_name"] = $user["first_name"];
+	// 	}
+	// 	return json_encode($team);
+	// }
+	// 
+	// function getTeammate($team_id, $user_id) {
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$user_id = sqlite_escape_string($user_id);
+	// 	
+	// 	$team = json_decode($this->getTeam($team_id));
+	// 	$teammate_id = ($user_id == $team->{"user1_id"}) ? $team->{"user2_id"} : $team->{"user1_id"};
+	// 	$teammate_query = "SELECT * FROM users WHERE user_id='" . $teammate_id . "'";
+	// 	if ($result = $this->db_handle->query($teammate_query)) {
+	// 		return json_encode($result->fetch());
+	// 	}
+	// 	return 0; 
+	// }
 	
-	function getTeammate($team_id, $user_id) {
-		$team_id = sqlite_escape_string($team_id);
+	function getOpponent($game_id, $user_id) {
+		$game_id = sqlite_escape_string($game_id);
 		$user_id = sqlite_escape_string($user_id);
 		
-		$team = json_decode($this->getTeam($team_id));
-		$teammate_id = ($user_id == $team->{"user1_id"}) ? $team->{"user2_id"} : $team->{"user1_id"};
-		$teammate_query = "SELECT * FROM users WHERE user_id='" . $teammate_id . "'";
-		if ($result = $this->db_handle->query($teammate_query)) {
+		$game = json_decode($this->getGame($game_id));
+		$opponent_id = ($user_id == $game->{"user1_id"}) ? $game->{"user2_id"} : $game->{"user1_id"};
+		$opponent_query = "SELECT * FROM users WHERE user_id='" . $opponent_id . "'";
+		if ($result = $this->db_handle->query($opponent_query)) {
 			return json_encode($result->fetch());
 		}
 		return 0; 
@@ -603,33 +882,94 @@ class MindReadrDb {
 		return $topics_select;
 	}
 	
-	function recordClue($game_id, $team_id, $user_id, $answer_id, $clue, $points) {
+	// function recordClue($game_id, $team_id, $user_id, $answer_id, $clue, $points) {
+	// 	$game_id = sqlite_escape_string($game_id);
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$user_id = sqlite_escape_string($user_id);
+	// 	$answer_id = sqlite_escape_string($answer_id);
+	// 	$clue = sqlite_escape_string($clue);
+	// 	$points = sqlite_escape_string($points);
+	// 	
+	// 	$teammate = json_decode($this->getTeammate($team_id, $user_id));
+	// 	$teammate_id = $teammate->{"user_id"};
+	// 	
+	// 	$clue_query = "INSERT INTO clues(clue, game_id, giver_id, receiver_id, answer_id, points) VALUES('%s', '%d', '%d', '%d', '%d', '%d')";
+	// 	$clue_query = sprintf($clue_query, $clue, $game_id, $user_id, $teammate_id, $answer_id, $points);
+	// 	$this->db_handle->queryExec($clue_query);
+	// 	$clue_id = $this->db_handle->lastInsertRowid();
+	// 	
+	// 	$turn = $this->getTeamTurn($team_id);
+	// 	$clues_query = "UPDATE team_clues SET clue" . $turn . "_id='" . $clue_id . "' WHERE team_id='" . $team_id . "'";
+	// 	$this->db_handle->queryExec($clues_query);
+	// 	
+	// 	$this->setState($game_id, $user_id, $this->STATE_DONE_CLUE);
+	// 	$this->setState($game_id, $teammate_id, $this->STATE_GUESS);
+	// }
+
+	function recordClue($game_id, $user_id, $answer_id, $clue, $points) {
 		$game_id = sqlite_escape_string($game_id);
-		$team_id = sqlite_escape_string($team_id);
 		$user_id = sqlite_escape_string($user_id);
 		$answer_id = sqlite_escape_string($answer_id);
 		$clue = sqlite_escape_string($clue);
 		$points = sqlite_escape_string($points);
 		
-		$teammate = json_decode($this->getTeammate($team_id, $user_id));
-		$teammate_id = $teammate->{"user_id"};
+		$opponent = json_decode($this->getOpponent($game_id, $user_id));
+		$opponent_id = $opponent->{"user_id"};
 		
 		$clue_query = "INSERT INTO clues(clue, game_id, giver_id, receiver_id, answer_id, points) VALUES('%s', '%d', '%d', '%d', '%d', '%d')";
-		$clue_query = sprintf($clue_query, $clue, $game_id, $user_id, $teammate_id, $answer_id, $points);
+		$clue_query = sprintf($clue_query, $clue, $game_id, $user_id, $opponent_id, $answer_id, $points);
 		$this->db_handle->queryExec($clue_query);
 		$clue_id = $this->db_handle->lastInsertRowid();
 		
-		$turn = $this->getTeamTurn($team_id);
-		$clues_query = "UPDATE team_clues SET clue" . $turn . "_id='" . $clue_id . "' WHERE team_id='" . $team_id . "'";
+		$turn = $this->getTurn($game_id);
+		$clues_query = "UPDATE game_clues SET clue" . $turn . "_id='" . $clue_id . "' WHERE game_id='" . $game_id . "'";
 		$this->db_handle->queryExec($clues_query);
 		
 		$this->setState($game_id, $user_id, $this->STATE_DONE_CLUE);
-		$this->setState($game_id, $teammate_id, $this->STATE_GUESS);
+		$this->setState($game_id, $opponent_id, $this->STATE_GUESS);
 	}
 
-	function validateGuess($game_id, $team_id, $user_id, $clue_id, $guess, $points) {
+	// function validateGuess($game_id, $team_id, $user_id, $clue_id, $guess, $points) {
+	// 	$game_id = sqlite_escape_string($game_id);
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$user_id = sqlite_escape_string($user_id);
+	// 	$clue_id = sqlite_escape_string($clue_id);
+	// 	$guess = sqlite_escape_string($guess);
+	// 	$points = sqlite_escape_string($points);
+	// 	
+	// 	$answer_id = 0;
+	// 	
+	// 	$validate_query = "SELECT * FROM clues JOIN answers ON clues.answer_id=answers.answer_id WHERE clue_id='" . $clue_id . "'";
+	// 	$result = $this->db_handle->query($validate_query);
+	// 	if ($result) {
+	// 		$result = $result->fetch();
+	// 		$answer = $result["answers.answer"];
+	// 		if (strcasecmp($guess, $answer) == 0) {
+	// 			$answer_id = $result["answers.answer_id"];	
+	// 			$teammate = json_decode($this->getTeammate($team_id, $user_id));
+	// 			$teammate_id = $teammate->{"user_id"};
+	// 			
+	// 			$team = json_decode($this->getTeam($team_id));
+	// 			$score = $team->{"score"} + points;
+	// 			$turn = $team->{"turn"} + 1;
+	// 			
+	// 			$update_query = "UPDATE teams SET score='" . $score . "', turn='" . $turn . "' WHERE team_id='" . $team_id . "'";
+	// 			$this->db_handle->queryExec($update_query);
+	// 			
+	// 			$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
+	// 			$this->setState($game_id, $teammate_id, $this->STATE_WAIT_CLUE);
+	// 		}
+	// 	}
+	// 	
+	// 	$guess_query = "INSERT INTO guesses(game_id, user_id, answer_id, clue_id, guess) VALUES('%d', '%d', '%d', '%d', '%s')";
+	// 	$guess_query = sprintf($guess_query, $game_id, $user_id, $answer_id, $clue_id, $guess);
+	// 	$this->db_handle->queryExec($guess_query);
+	// 	
+	// 	return $answer_id;
+	// }
+	
+	function validateGuess($game_id, $user_id, $clue_id, $guess, $points) {
 		$game_id = sqlite_escape_string($game_id);
-		$team_id = sqlite_escape_string($team_id);
 		$user_id = sqlite_escape_string($user_id);
 		$clue_id = sqlite_escape_string($clue_id);
 		$guess = sqlite_escape_string($guess);
@@ -644,18 +984,23 @@ class MindReadrDb {
 			$answer = $result["answers.answer"];
 			if (strcasecmp($guess, $answer) == 0) {
 				$answer_id = $result["answers.answer_id"];	
-				$teammate = json_decode($this->getTeammate($team_id, $user_id));
-				$teammate_id = $teammate->{"user_id"};
+				$opponent = json_decode($this->getOpponent($team_id, $user_id));
+				$opponent_id = $opponent->{"user_id"};
 				
-				$team = json_decode($this->getTeam($team_id));
-				$score = $team->{"score"} + points;
-				$turn = $team->{"turn"} + 1;
+				$game = json_decode($this->getGame($game_id));
+				$turn = $game->{"turn"} + 1;
 				
-				$update_query = "UPDATE teams SET score='" . $score . "', turn='" . $turn . "' WHERE team_id='" . $team_id . "'";
+				if ($user_id == $game->{"user1_id"}) {
+					$score = $game->{"score1"} + points;
+					$update_query = "UPDATE games SET score1='" . $score . "', turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
+				} else if ($user_id == $game->{"user2_id"}) {
+					$score = $game->{"score2"} + points;
+					$update_query = "UPDATE games SET score2='" . $score . "', turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
+				}
 				$this->db_handle->queryExec($update_query);
 				
 				$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
-				$this->setState($game_id, $teammate_id, $this->STATE_WAIT_CLUE);
+				$this->setState($game_id, $opponent, $this->STATE_WAIT_CLUE);
 			}
 		}
 		
@@ -666,13 +1011,28 @@ class MindReadrDb {
 		return $answer_id;
 	}
 	
-	function getScore($team_id) {
-		$team_id = sqlite_escape_string($team_id);
-		$score_query = "SELECT score FROM teams WHERE team_id='" . $team_id . "'";
+	// function getScore($team_id) {
+	// 	$team_id = sqlite_escape_string($team_id);
+	// 	$score_query = "SELECT score FROM teams WHERE team_id='" . $team_id . "'";
+	// 	$result = $this->db_handle->query($score_query);
+	// 	if ($result) {
+	// 		$score = $result->fetch();
+	// 		return $score["score"];
+	// 	}
+	// 	return 0;
+	// }
+	
+	function getScore($game_id, $user_id) {
+		$game_id = sqlite_escape_string($game_id);
+		$score_query = "SELECT user1_id, user2_id, score1, score2 FROM games WHERE game_id='" . $game_id . "'";
 		$result = $this->db_handle->query($score_query);
 		if ($result) {
 			$score = $result->fetch();
-			return $score["score"];
+			if ($user_id == $score["user1_id"]) {
+				return $score["score1"];
+			} else if ($user_id == $score["user2_id"]) {
+				return $score["score2"];
+			}
 		}
 		return 0;
 	}

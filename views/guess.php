@@ -7,17 +7,16 @@
 	session_start();
 
 	$game_id = $_GET["game_id"];
-	$team_id = $_GET["team_id"];
 	$clue_id = $_GET["clue_id"];
 	$turn = $_GET["turn"];
-	$teammate = json_decode($db->getTeammate($team_id, $_SESSION["me"]["id"]));
+	$opponent = json_decode($db->getOpponent($game_id, $_SESSION["me"]["id"]));
 
-	if ($team = $db->getTeam($team_id)) {
-		$team = json_decode($team);
+	if ($game = $db->getGame($game_id)) {
+		$game = json_decode($game);
 	}
 	
 	if (!$clue_id) {
-		$clue = json_decode($db->getClueNoId($team_id, $turn));
+		$clue = json_decode($db->getClueNoId($game_id, $turn));
 	} else {
 		$clue = $db->getClue($clue_id);
 		if ($clue) {
@@ -37,12 +36,29 @@
 	<div data-role="content">
 		<div class="ui-grid-a">
 			<div class="ui-block-a">
-				Turn: <strong><?php echo $team->{"turn"}; ?></strong><br />
-				Score: <strong><?php echo $team->{"score"}; ?></strong>
+				Turn: <strong><?php echo $game->{"turn"}; ?></strong><br />
+				Your Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score1"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score2"};
+						}
+					?>
+				</strong><br />
+				<?php echo $opponent->{"first_name"}; ?>'s Score: <strong>
+					<?php 
+						if ($_SESSION["me"]["id"] == $game->{"user1_id"}) {
+							echo $game->{"score2"};
+						} else if ($_SESSION["me"]["id"] == $game->{"user2_id"}) {
+							echo $game->{"score1"};
+						}
+					?>
+				</strong>
 			</div>
 			<div class="ui-block-b">
 				<img src="https://graph.facebook.com/<?php echo $_SESSION["me"]["id"]; ?>/picture" />
-				<img src="https://graph.facebook.com/<?php echo $teammate->{"user_id"}; ?>/picture" />
+				<img src="https://graph.facebook.com/<?php echo $opponent->{"user_id"}; ?>/picture" />
 			</div>
 		</div><!-- /grid-a -->
 		<h4>Clue:</h4>
@@ -54,7 +70,7 @@
 			    <label for="clue">Your guess:</label>
 			    <input type="text" name="guess" id="guess" value=""  />
 			</div>
-			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $team_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id']; ?>,10);">Submit</div>
+			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id']; ?>,10);">Submit</div>
 		</form>
 	</div><!-- /content -->
 
