@@ -25,6 +25,8 @@
 			$clue = json_decode($answer);
 		}
 	}
+	
+	$points = $clue->{"points"};
 ?>
 
 <div data-role="page">
@@ -74,8 +76,10 @@
 			<div data-role="fieldcontain">
 			    <label for="clue">Your guess:</label>
 			    <input type="text" name="guess" id="guess" value=""  />
+				Points: <strong><span id="points"><?php echo $points; ?></span></strong>
+			    
 			</div>
-			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id']; ?>,10);">Submit</div>
+			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id']; ?>);">Submit</div>
 		</form>
 	</div><!-- /content -->
 

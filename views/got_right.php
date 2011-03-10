@@ -63,7 +63,7 @@
 				echo '<p class="answer_text">' . $answer->{"media"} . '</p>';
 			} else if ($answer->{"type"} == "image") {
 				echo '<div class="clue_img">';
-				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="clue" />';
+				echo '<img src="http://cgi.stanford.edu/~mduong/ed196x/' . $answer->{"media"} . '" class="clue" />';
 				echo '</div>';
 			}
 		?>

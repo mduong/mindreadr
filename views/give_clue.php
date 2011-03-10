@@ -11,6 +11,19 @@
 	$difficulty = $_GET["difficulty"];
 	$turn = $_GET["turn"];
 	$opponent = json_decode($db->getOpponent($game_id, $_SESSION["me"]["id"]));
+	
+	$points = 0;
+	switch ($difficulty) {
+		case 1:
+			$points = 2000;
+			break;
+		case 2:
+			$points = 2500;
+			break;
+		case 3:
+			$points = 3000;
+			break;
+	}
 
 	if ($game = $db->getGame($game_id)) {
 		$game = json_decode($game);
@@ -71,21 +84,28 @@
 				echo '<p class="answer_text">' . $answer->{"media"} . '</p>';
 			} else if ($answer->{"type"} == "image") {
 				echo '<div class="clue_img">';
-				echo '<img src="' . substr($answer->{"media"}, 3) . '" class="clue" />';
+				echo '<img src="http://cgi.stanford.edu/~mduong/ed196x/' . $answer->{"media"} . '" class="clue" />';
 				echo '</div>';
 			}
 		?>
-		<div data-role="button" onclick="revealAnswer(<?php echo $answer->{'answer_id'}; ?>);" id="reveal_btn">Reveal answer</div>
+		<div data-role="button" onclick="revealAnswer(<?php echo $answer->{'answer_id'} . "," . $difficulty; ?>);" id="reveal_btn">Reveal answer 
+		<?php
+			if ($difficulty == 1) echo "(-1000 pts)";
+			else if ($difficulty == 2) echo "(-1500 pts)";
+			else if ($difficulty == 3) echo "(-2000 pts)";
+		?>
+		</div>
 		<div id="answer_container"></div>
 		<form action="http://cgi.stanford.edu/~mduong/ed196x/actions/games/submit_clue.php" method="get">
 			<div data-role="fieldcontain">
 			    <label for="clue">Your clue:</label>
 			    <input type="text" name="clue" id="clue" value=""  />
+				Points: <strong><span id="points"><?php echo $points; ?></span></strong>
 			</div>
 			<input type="hidden" name="game_id" value="<?php echo $game_id; ?>" />
 			<input type="hidden" name="answer_id" value="<?php echo $answer->{'answer_id'}; ?>" />
 			<input type="hidden" name="user_id" value="<?php echo $_SESSION["me"]["id"]; ?>" />
-			<input type="hidden" name="points" value="10" />
+			<input type="hidden" name="points" value="<?php echo $points; ?>" />
 			<input type="submit" value="Submit" />
 		</form>
 	</div><!-- /content -->

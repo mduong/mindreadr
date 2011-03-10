@@ -40,7 +40,7 @@
 	if ($media2_type == "text") {
 		$media2 = $_POST["media2"];
 	} else if ($media2_type == "image") {
-		$media2 = "../../upload/";
+		$media2 = "upload/";
 		if ($media0_type == "image" && $media1_type == "image") {
 			$media2 .= $_FILES["media"]["name"][2];
 			$media2_tmp = $_FILES["media"]["name"][2];
