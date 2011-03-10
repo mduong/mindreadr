@@ -1017,6 +1017,21 @@ class MindReadrDb {
 		
 		return $answer_id;
 	}
+
+	function fail($game_id, $user_id) {
+		$game_id = sqlite_escape_string($game_id);
+		$user_id = sqlite_escape_string($user_id);
+		
+		$opponent = json_decode($this->getOpponent($game_id, $user_id));
+		$opponent_id = $opponent->{"user_id"};
+		$this->setState($game_id, $user_id, $this->STATE_DIFFICULTY);
+		$this->setState($game_id, $opponent_id, $this->STATE_WAIT_CLUE);
+		
+		$game = json_decode($this->getGame($game_id));
+		$turn = $game->{"turn"} + 1;
+		$update_query = "UPDATE games SET turn='" . $turn . "' WHERE game_id='" . $game_id . "'";
+		$this->db_handle->queryExec($update_query);
+	}
 	
 	// function getScore($team_id) {
 	// 	$team_id = sqlite_escape_string($team_id);

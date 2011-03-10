@@ -67,9 +67,9 @@
 			</div>
 		</div><!-- /grid-a -->
 		<h3>Select a difficulty: </h3>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 1);">Easy</button>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 2);">Medium</button>
-		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 3);">Hard</button>
+		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 1);">Easy (2000 points)</button>
+		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 2);">Medium (2500 points)</button>
+		<button data-type="button" onclick="chooseDifficulty(<?php echo $game_id . ", " . $user_id; ?>, 3);">Hard (3000 points)</button>
 	</div><!-- /content -->
 
 	<div data-role="footer">

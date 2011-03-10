@@ -21,6 +21,7 @@
 		<div data-role="page">
 			<div data-role="header">
 				<h1>MindReadr</h1>
+				<a href="views/about.php" class="ui-button-left">About</a>
 				<a href="<?php echo $facebook->getLogoutUrl(array('next' => 'http://cgi.stanford.edu/~mduong/ed196x/actions/account/logout.php')); ?>" class="ui-btn-right">Logout</a>
 			</div>
 			

@@ -22,7 +22,7 @@
 	} else {
 		$clue = $db->getClue($clue_id);
 		if ($clue) {
-			$clue = json_decode($answer);
+			$clue = json_decode($clue);
 		}
 	}
 	
@@ -79,7 +79,7 @@
 				Points: <strong><span id="points"><?php echo $points; ?></span></strong>
 			    
 			</div>
-			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id']; ?>);">Submit</div>
+			<div data-role="button" onclick="validateGuess(<?php echo $game_id . ',' . $clue->{'clue_id'} . ',' . $_SESSION['me']['id'] . ',' . $clue->{'answer_id'}; ?>);">Submit</div>
 		</form>
 	</div><!-- /content -->
 
